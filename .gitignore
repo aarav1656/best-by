@@ -16,3 +16,10 @@ console/.env*.local
 data/cases/
 docs/*.visual-check.*
 .progress/
+video/casts/
+video/clips/
+video/frames/
+video/narration/
+video/out/
+video/cards/
+video/console_*.png
