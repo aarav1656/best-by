@@ -174,6 +174,55 @@ The count is `--t-count`, the qualifier is `--t-micro`. Bay names come verbatim 
 because it is the number that set the urgency in the first place. Neither block is rendered when
 its side of the decision is empty.
 
+### Band (what a person already did, and whether it finished)
+
+A band sits directly under a block head and reports an action that has already happened. Two
+states and no third, because the only question is whether the obligation is discharged.
+
+| State | Treatment |
+|---|---|
+| finished | `--sheet-2` inset, 2px left rule in `--act`, one mono uppercase mark, then the mono detail |
+| short | `--sheet-2` inset, 2px left rule in `--hazard`, and a **serif statement in `--hazard`** naming the gap before any mono detail |
+
+The short state promotes to serif deliberately. Mono is what the agent can prove; serif is what it
+is telling you. "The pull is short by 24 units." is a sentence a person has to read, not a field.
+
+### Delivery row (the receipt)
+
+One row per household on the notify list, joined to what SES actually did. Four states, and none
+of them may read as success unless the family was actually reached.
+
+| `mode` | Mark | Colour | Left rule | What the row says |
+|---|---|---|---|---|
+| `direct` | `REACHED` | `--act` | none | sent to the household's own address, with the SES message id verbatim |
+| `simulator` | `NOT REACHED` | `--wait` | 2px `--wait`, 6% wash | names both addresses: sent to the mailbox simulator, **not** to the household |
+| `failed` | `SEND FAILED` | `--hazard` | 2px `--hazard`, 6% wash | the SES error string verbatim, no message id |
+| no message on the row | `NO RECORD` | `--hazard` | 2px `--hazard`, 6% wash | no send was attempted for this household |
+
+`simulator` is the state this system exists to make visible. SES accepted the message, the API
+returned a message id, and the family was still not told. An id is an accepted request, not a
+delivered notice, so the mark says `NOT REACHED` and the row carries the same wash as a failure.
+A summary band above the rows leads with the number that matters: "4 of 10 households were not
+reached." Never a percentage, never a success rate.
+
+The same rule governs every caption downstream. The drafted notice is captioned from the delivery
+record, never from `status`, so a case whose status is `notified` but whose sends did not all land
+reads "sent, but 4 households above did not receive it".
+
+### Closed row (the queue's receipt shelf)
+
+A case with `status: notified` is not a decision and must not be drawn as one. It loses the
+statement type, the obligation blocks and the hazard sentence, and becomes one line: headline in
+17px serif `--ink-2`, recall number, and the delivery outcome right aligned in `--act`. When the
+delivery did not reach everyone, the outcome flips to `--hazard` and the section note says so.
+
+The header count and the footer count both report cases that still need a decision. A case that is
+done is never counted as work.
+
+The win state is withheld whenever any closed case has an unreached household, because a queue
+that reads "nothing is under recall" while a family is still eating it is the worst screen this
+product could draw.
+
 ### Check row (the audit trail)
 
 Grid: `[mark] [name, mono] [detail, mono, tabular]`. This is the point of the detail page. The
