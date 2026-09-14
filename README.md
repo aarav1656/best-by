@@ -108,8 +108,13 @@ clostridium botulinum." Its `code_info` recalls **exactly one lot**:
 
 ```
 $ curl -s "https://api.fda.gov/food/enforcement.json?search=recall_number:%22F-0617-2025%22" | jq -r '.results[0].code_info'
-Lot S88N D1M, Best By 01/17/2028
+Best By dates: 01/17/2028 Lots: S88N D1M
 ```
+
+That whole string is the notice's identification of the affected units. It is
+free text. `agent/feeds/openfda.py` has to turn it into
+`lot_codes=("S88N D1M",)` and `best_by_dates=(date(2028, 1, 17),)`, and be right
+about a firm that wrote the date first and the lot second, with no comma.
 
 So the photograph the volunteer took at intake in July is the thing that makes
 this a four-case pull and a ten-household phone list in September, and the
@@ -164,12 +169,15 @@ Riverbend Community Pantry, Dayton OH
 23 intake lots, 2239 units on the shelf, 319 units already distributed to 14 households
 checked against 614 open FDA food recalls (202 pairs judged, source: live openFDA)
 
+10 interruption(s): pull 23 case(s), notify 14 household(s), check 9 lot(s) by hand
+32 lot(s) were compared against a recalled code and stay on the shelf
+
 [same_day] H-0835-2026 Class I
   pull 5 cases, notify 8 households
   Good & Gather Mexican Street Corn Trail Mix 8 oz bag UPC 085239270240, 8 bags per case
   hazard: potential presence of Salmonella
     PULL   5 case(s), 38 units, Dry Goods C2, lot none  [best_by]
-    NOTIFY 8 household(s), 53 units, 5 with a child under five
+    NOTIFY 8 household(s), 53 units, 8 with a child under five
 
 [today] F-0610-2025 Class II
   pull 7 cases, notify 14 households
@@ -377,12 +385,22 @@ Full suite, from a clean shell with no credentials and no API key:
 
 ```
 $ env -i PATH="$PATH" HOME="$HOME" .venv/bin/python -m pytest tests -q
-109 passed, 2 deselected in 1.23s
+120 passed, 3 deselected in 1.23s
 ```
 
-The 2 deselected are the live model reads, marked `@pytest.mark.live`. Every
-other test runs against real captured API responses in `data/`, never an invented
-fixture.
+The 3 deselected are marked `@pytest.mark.live` because they hit the real model
+or real SES. They pass too, with credentials:
+
+```
+$ .venv/bin/python -m pytest tests -q -m live
+3 passed, 120 deselected in 29.84s
+```
+
+Those three are the ones that prove the claims on this page: the vision model
+reading `S88N D1M` off the real photograph, that read settling the real
+F-0617-2025 recall from NEEDS_EVIDENCE to MATCH, and SES returning a real message
+id. Every other test runs against real captured API responses in `data/`, never
+an invented fixture.
 
 ---
 

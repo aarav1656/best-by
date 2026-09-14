@@ -43,6 +43,10 @@ function normalise(raw: Record<string, unknown>): Case {
     },
     needs_evidence: c.needs_evidence ?? [],
     timeline: c.timeline ?? [],
+    delivery: c.delivery
+      ? { ...c.delivery, messages: c.delivery.messages ?? [] }
+      : null,
+    pull_record: c.pull_record ?? null,
   };
 }
 

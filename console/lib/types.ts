@@ -73,6 +73,40 @@ export interface Recall {
   source: string;
 }
 
+export type DeliveryMode = "direct" | "simulator" | "failed";
+
+export interface DeliveryMessage {
+  household_id: string;
+  case_id: string;
+  /** the household's own address, which is not always the one that was reached */
+  intended: string;
+  /** the address SES actually accepted */
+  to: string;
+  mode: DeliveryMode;
+  message_id?: string;
+  error?: string;
+  at: string;
+}
+
+export interface Delivery {
+  at: string;
+  recall_number: string;
+  sender: string;
+  attempted: number;
+  direct: number;
+  simulator: number;
+  failed: number;
+  messages: DeliveryMessage[];
+}
+
+export interface PullRecord {
+  at: string;
+  pulled_by: string;
+  units_destroyed: number;
+  units_expected: number;
+  complete: boolean;
+}
+
 export interface TimelineEvent {
   at: string;
   event: string;
@@ -92,7 +126,8 @@ export interface Case {
   notify: NotifyPlan;
   needs_evidence: Lot[];
   notice_text: string | null;
-  delivery: unknown | null;
+  delivery: Delivery | null;
+  pull_record: PullRecord | null;
   evidence_uri: string | null;
   timeline: TimelineEvent[];
   created_at: string;
