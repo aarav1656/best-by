@@ -470,7 +470,11 @@ def build_agent(
         previous = sink.read(pantry.pantry_id, cid)
         if previous:
             case["created_at"] = previous.get("created_at", case["created_at"])
-            case["timeline"] = list(previous.get("timeline", [])) + case["timeline"]
+            # The timeline is not carried forward here. `agent/store.py` owns
+            # merging it, and doing it in both places concatenated the stored
+            # copy with itself on every pass: six runs turned 22 real events
+            # into 3,247 entries and a 378KB item against DynamoDB's 400KB
+            # ceiling. Write the new entries only and let the store union them.
             for carried in ("delivery", "notice_text", "evidence_uri", "pull_record"):
                 if previous.get(carried):
                     case[carried] = previous[carried]

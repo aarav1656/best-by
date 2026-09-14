@@ -10,8 +10,8 @@
       "revision": "5293e2b197819a92fc13e16300f354b15d7d1d6e"
     },
     "viewBox": [
-      1360,
-      900
+      1280,
+      660
     ],
     "views": [
       {
@@ -65,10 +65,10 @@
       "tag": "weeks before any recall",
       "pos": [
         40,
-        52
+        16
       ],
       "size": [
-        185,
+        195,
         72
       ],
       "sources": [
@@ -86,8 +86,8 @@
       "sublabel": "stamped code off the panel",
       "tag": "reports unreadable, never guesses",
       "pos": [
-        280,
-        52
+        375,
+        16
       ],
       "size": [
         195,
@@ -108,11 +108,11 @@
       "sublabel": "lots, distributions, households",
       "tag": "23 lots, 2,239 on shelf, 319 out",
       "pos": [
-        535,
-        52
+        710,
+        16
       ],
       "size": [
-        210,
+        195,
         72
       ],
       "sources": [
@@ -131,10 +131,10 @@
       "tag": "live, no auth",
       "pos": [
         40,
-        218
+        144
       ],
       "size": [
-        185,
+        195,
         72
       ],
       "sources": [
@@ -150,10 +150,10 @@
       "type": "backend",
       "label": "Identifier extractor",
       "sublabel": "code_info prose to checkable facts",
-      "tag": "27.0% carry nothing checkable",
+      "tag": "27.0% name nothing checkable",
       "pos": [
-        280,
-        218
+        375,
+        144
       ],
       "size": [
         195,
@@ -174,11 +174,11 @@
       "sublabel": "MATCH, NEEDS_EVIDENCE, NO_MATCH",
       "tag": "no prompt reaches it",
       "pos": [
-        535,
-        218
+        710,
+        144
       ],
       "size": [
-        210,
+        195,
         72
       ],
       "sources": [
@@ -196,11 +196,11 @@
       "sublabel": "one verdict, two obligations",
       "tag": "grouped per recall",
       "pos": [
-        805,
-        218
+        1045,
+        144
       ],
       "size": [
-        200,
+        195,
         72
       ],
       "sources": [
@@ -212,39 +212,17 @@
       ]
     },
     {
-      "id": "veto",
-      "type": "security",
-      "label": "NotifyVeto",
-      "sublabel": "BeforeToolCallEvent hook",
-      "tag": "cancels notify_households",
-      "pos": [
-        1065,
-        218
-      ],
-      "size": [
-        195,
-        72
-      ],
-      "sources": [
-        {
-          "path": "agent/bestby_agent.py",
-          "line": 151,
-          "label": "NotifyVeto"
-        }
-      ]
-    },
-    {
       "id": "scheduler",
       "type": "cloud",
       "label": "EventBridge Scheduler",
       "sublabel": "cron(0 11 * * ? *)",
-      "tag": "07:00 Dayton, before the doors open",
+      "tag": "07:00 in Dayton Ohio",
       "pos": [
         40,
-        396
+        272
       ],
       "size": [
-        185,
+        195,
         72
       ],
       "sources": [
@@ -261,8 +239,8 @@
       "label": "AWS Lambda",
       "sublabel": "bestby-run",
       "pos": [
-        280,
-        396
+        375,
+        272
       ],
       "size": [
         195,
@@ -283,11 +261,11 @@
       "sublabel": "10 tools, reads product identity",
       "tag": "Anthropic API, not Bedrock",
       "pos": [
-        535,
-        396
+        710,
+        272
       ],
       "size": [
-        210,
+        195,
         72
       ],
       "sources": [
@@ -299,14 +277,14 @@
       ]
     },
     {
-      "id": "gate",
+      "id": "veto",
       "type": "security",
-      "label": "Approval gate",
-      "sublabel": "HumanInTheLoop intervention",
-      "tag": "allowed_tools [\"*\", \"!notify_households\"]",
+      "label": "NotifyVeto",
+      "sublabel": "BeforeToolCallEvent hook",
+      "tag": "cancels notify_households",
       "pos": [
-        1065,
-        396
+        1045,
+        272
       ],
       "size": [
         195,
@@ -315,8 +293,8 @@
       "sources": [
         {
           "path": "agent/bestby_agent.py",
-          "line": 214,
-          "label": "approval_gate"
+          "line": 151,
+          "label": "NotifyVeto"
         }
       ]
     },
@@ -327,8 +305,8 @@
       "sublabel": "bestby-evidence-079415246611",
       "tag": "what an inspector asks for",
       "pos": [
-        280,
-        574
+        40,
+        400
       ],
       "size": [
         195,
@@ -349,11 +327,11 @@
       "sublabel": "bestby-cases, bestby-recalls",
       "tag": "PK pantry_id, SK case_id",
       "pos": [
-        535,
-        574
+        710,
+        400
       ],
       "size": [
-        210,
+        195,
         72
       ],
       "sources": [
@@ -365,14 +343,14 @@
       ]
     },
     {
-      "id": "ses",
-      "type": "cloud",
-      "label": "Amazon SES",
-      "sublabel": "recall notice per household",
-      "tag": "bestby@getava.xyz",
+      "id": "gate",
+      "type": "security",
+      "label": "Approval gate",
+      "sublabel": "Strands HumanInTheLoop",
+      "tag": "allowed_tools: !notify_households",
       "pos": [
-        1065,
-        574
+        1045,
+        400
       ],
       "size": [
         195,
@@ -380,9 +358,9 @@
       ],
       "sources": [
         {
-          "path": "agent/dispatch.py",
-          "line": 74,
-          "label": "send_notice"
+          "path": "agent/bestby_agent.py",
+          "line": 214,
+          "label": "approval_gate"
         }
       ]
     },
@@ -393,11 +371,11 @@
       "sublabel": "the decision queue",
       "tag": "healthy state is empty",
       "pos": [
-        535,
-        752
+        375,
+        528
       ],
       "size": [
-        210,
+        195,
         72
       ],
       "sources": [
@@ -414,12 +392,34 @@
       "label": "Coordinator",
       "sublabel": "one decision per recall",
       "pos": [
-        805,
-        752
+        710,
+        528
       ],
       "size": [
-        200,
+        195,
         72
+      ]
+    },
+    {
+      "id": "ses",
+      "type": "cloud",
+      "label": "Amazon SES",
+      "sublabel": "recall notice per household",
+      "tag": "bestby@getava.xyz",
+      "pos": [
+        1045,
+        528
+      ],
+      "size": [
+        195,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/dispatch.py",
+          "line": 74,
+          "label": "send_notice"
+        }
       ]
     }
   ],
@@ -432,7 +432,8 @@
         "lambda",
         "s3",
         "dynamo"
-      ]
+      ],
+      "pad": 16
     }
   ],
   "connections": [
@@ -455,7 +456,8 @@
       "to": "verdict",
       "label": "what is held, what went out",
       "fromSide": "bottom",
-      "toSide": "top"
+      "toSide": "top",
+      "labelDy": 41
     },
     {
       "id": "reports",
@@ -467,7 +469,7 @@
       "id": "facts",
       "from": "extractor",
       "to": "verdict",
-      "label": "lot codes, UPCs, dates, states"
+      "label": "lot codes, UPCs, dates"
     },
     {
       "id": "ruling",
@@ -479,15 +481,21 @@
       "id": "pull",
       "from": "sweep",
       "to": "agent",
-      "label": "PULL: units still on the shelf",
-      "variant": "emphasis"
+      "label": "PULL: units on the shelf",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top"
     },
     {
       "id": "notify",
       "from": "sweep",
       "to": "veto",
-      "label": "NOTIFY: units already taken home",
-      "variant": "security"
+      "label": "NOTIFY: units taken home",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 41,
+      "labelDx": 58
     },
     {
       "id": "tick",
@@ -508,7 +516,8 @@
       "to": "verdict",
       "label": "product identity only",
       "fromSide": "top",
-      "toSide": "bottom"
+      "toSide": "bottom",
+      "labelDx": -90
     },
     {
       "id": "attempt",
@@ -516,16 +525,17 @@
       "to": "veto",
       "label": "notify_households",
       "fromSide": "right",
-      "toSide": "bottom"
+      "toSide": "left"
     },
     {
-      "id": "held-back",
+      "id": "heldback",
       "from": "veto",
       "to": "gate",
-      "label": "MATCH, distribution, drafted notice",
+      "label": "MATCH, distribution, draft",
       "variant": "security",
       "fromSide": "bottom",
-      "toSide": "top"
+      "toSide": "top",
+      "labelDy": 41
     },
     {
       "id": "approved",
@@ -534,7 +544,8 @@
       "label": "coordinator approved",
       "variant": "security",
       "fromSide": "bottom",
-      "toSide": "top"
+      "toSide": "top",
+      "labelDy": 41
     },
     {
       "id": "record",
@@ -542,7 +553,7 @@
       "to": "s3",
       "label": "disposal record",
       "variant": "dashed",
-      "fromSide": "left",
+      "fromSide": "bottom",
       "toSide": "top"
     },
     {
@@ -551,7 +562,9 @@
       "to": "dynamo",
       "label": "one case per recall",
       "fromSide": "bottom",
-      "toSide": "top"
+      "toSide": "top",
+      "labelDy": 41,
+      "labelDx": 50
     },
     {
       "id": "queue",
@@ -565,16 +578,23 @@
       "id": "ask",
       "from": "console",
       "to": "coordinator",
-      "label": "pull list and notify list"
+      "label": "pull and notify lists"
     },
     {
       "id": "decision",
       "from": "coordinator",
-      "to": "gate",
-      "label": "approve before any household is contacted",
-      "variant": "security",
-      "fromSide": "right",
-      "toSide": "right"
+      "to": "console",
+      "label": "approve, decline",
+      "fromSide": "bottom",
+      "toSide": "bottom"
+    },
+    {
+      "id": "approve",
+      "from": "console",
+      "to": "dynamo",
+      "label": "approved case id",
+      "fromSide": "left",
+      "toSide": "left"
     }
   ],
   "cards": [

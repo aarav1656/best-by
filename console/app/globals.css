@@ -785,6 +785,21 @@
     word-break: break-word;
   }
 
+  @media (max-width: 640px) {
+    .masthead {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .masthead-pantry {
+      text-align: left;
+    }
+
+    .obligations {
+      grid-template-columns: 1fr;
+    }
+  }
+
   @media (max-width: 820px) {
     .record {
       grid-template-columns: 1fr;

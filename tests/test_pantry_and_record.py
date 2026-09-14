@@ -180,3 +180,46 @@ def test_the_readme_disclosure_is_actually_in_the_intake_log():
     assert "representative" in payload["note"]
     assert "live" in payload["note"]
     assert payload["provenance"]["INT-2026-0718-02"].startswith("lot code S88N D1M")
+
+
+def test_the_timeline_merge_is_idempotent():
+    """The scheduled pass reruns the same work daily. It must converge.
+
+    Concatenating instead of merging turned 22 real events into 3,247 entries
+    over six passes and a 378KB item against DynamoDB's 400KB ceiling, which
+    surfaced to the agent as an unexplained write failure on a case a
+    coordinator had already approved.
+    """
+    from agent.store import merge_timeline
+
+    events = [
+        {"at": "2026-09-14T12:00:00+00:00", "event": "opened", "detail": "1 lot matched"},
+        {"at": "2026-09-14T12:00:05+00:00", "event": "notice_drafted", "detail": "62 words"},
+    ]
+    once = merge_timeline([], events)
+    twice = merge_timeline(once, events)
+    thrice = merge_timeline(twice, events)
+    assert once == events
+    assert twice == events
+    assert thrice == events
+
+
+def test_the_timeline_merge_keeps_genuinely_new_events():
+    """Deduplication must not be a wall: a real new event has to get through."""
+    from agent.store import merge_timeline
+
+    first = [{"at": "t1", "event": "opened", "detail": "a"}]
+    second = [{"at": "t2", "event": "pulled", "detail": "84 units"}]
+    assert merge_timeline(first, second) == first + second
+
+
+def test_the_timeline_is_bounded_and_says_when_it_trimmed():
+    from agent.store import TIMELINE_CAP, merge_timeline
+
+    many = [{"at": f"t{i}", "event": "e", "detail": str(i)} for i in range(TIMELINE_CAP + 50)]
+    merged = merge_timeline([], many)
+    assert len(merged) == TIMELINE_CAP
+    assert merged[0] == many[0], "the entry recording when the case opened must survive"
+    assert merged[1]["event"] == "timeline_trimmed"
+    assert "50 older entries dropped" in merged[1]["detail"]
+    assert merged[-1] == many[-1]

@@ -69,6 +69,57 @@ def _from_dynamo(value: Any) -> Any:
     return value
 
 
+# A DynamoDB item is capped at 400KB, and a case's timeline is the only part of
+# it that grows without bound. Two things were making it grow far faster than
+# the number of real events: the agent's `open_case` carried the stored timeline
+# forward and then handed the result back to `put_case`, which concatenated it
+# with the stored copy again, so every pass roughly doubled the list. Six passes
+# produced 3,247 entries of which 22 were distinct, and a 378KB item that was
+# about to start refusing writes with "Item size has exceeded the maximum
+# allowed size", surfacing to the agent as an unexplained failure on a case a
+# coordinator had already approved.
+#
+# Merging by identity rather than by concatenation makes the write idempotent,
+# which is the property it always needed: the scheduled pass reruns the same
+# work every morning and must converge, not accumulate.
+TIMELINE_CAP = 200
+
+
+def merge_timeline(previous: list[dict], current: list[dict]) -> list[dict]:
+    """Union of two timelines, in order, deduplicated, bounded.
+
+    Identity is (at, event, detail). Two passes that produce the same event at
+    the same second with the same wording produced the same event; keeping both
+    tells a coordinator nothing and costs the item its headroom.
+
+    The cap keeps the first entry, which is when the case opened and is the one
+    a compliance record needs, then the most recent entries, with a marker
+    saying how many were dropped so the record never silently shortens.
+    """
+    out: list[dict] = []
+    seen: set[tuple] = set()
+    for entry in list(previous) + list(current):
+        key = (entry.get("at"), entry.get("event"), entry.get("detail"))
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(entry)
+    if len(out) <= TIMELINE_CAP:
+        return out
+    dropped = len(out) - TIMELINE_CAP
+    return (
+        out[:1]
+        + [
+            {
+                "at": out[1].get("at"),
+                "event": "timeline_trimmed",
+                "detail": f"{dropped} older entries dropped to stay inside the item size limit",
+            }
+        ]
+        + out[-(TIMELINE_CAP - 2) :]
+    )
+
+
 class CaseStore:
     def __init__(self, table_name: str = CASES_TABLE) -> None:
         self.table = boto3.resource("dynamodb").Table(table_name)
@@ -83,7 +134,9 @@ class CaseStore:
         merged = dict(case)
         if previous:
             merged["created_at"] = previous.get("created_at", case.get("created_at"))
-            merged["timeline"] = list(previous.get("timeline", [])) + list(case.get("timeline", []))
+            merged["timeline"] = merge_timeline(
+                previous.get("timeline", []), case.get("timeline", [])
+            )
             for carried in ("delivery", "evidence_uri", "notice_text", "approved_by", "approved_at"):
                 if previous.get(carried) and not case.get(carried):
                     merged[carried] = previous[carried]

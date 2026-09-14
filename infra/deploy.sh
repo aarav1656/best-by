@@ -82,14 +82,28 @@ aws iam put-role-policy --role-name "${ROLE_NAME}" --policy-name bestby-logs --p
 # ses:SendEmail has no per-recipient resource to scope to. identity/* is the
 # tightest ARN pattern SES accepts: it means "send as an identity in this
 # account", not "any SES action anywhere".
+#
+# ListEmailIdentities is account-level and does not support resource-level
+# permissions, so scoping it to identity/* silently denies it. That is not a
+# theoretical nit: agent/dispatch.py calls it to decide whether SES in sandbox
+# will accept a household's real address or whether the notice has to be routed
+# to the mailbox simulator, so the denial surfaced as "the household
+# notification encountered a permission issue" on a case the coordinator had
+# already approved. It gets its own statement on "*".
 aws iam put-role-policy --role-name "${ROLE_NAME}" --policy-name bestby-ses --policy-document '{
   "Version": "2012-10-17",
   "Statement": [
     {
       "Sid": "BestByHouseholdNotices",
       "Effect": "Allow",
-      "Action": ["ses:SendEmail", "ses:ListEmailIdentities"],
+      "Action": ["ses:SendEmail"],
       "Resource": "arn:aws:ses:'"${REGION}"':'"${ACCOUNT_ID}"':identity/*"
+    },
+    {
+      "Sid": "BestByCheckDeliverability",
+      "Effect": "Allow",
+      "Action": ["ses:ListEmailIdentities"],
+      "Resource": "*"
     }
   ]
 }'
