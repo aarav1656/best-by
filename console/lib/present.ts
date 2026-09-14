@@ -46,7 +46,8 @@ export function stamp(iso: string | null): string {
 }
 
 /**
- * How a send actually landed. `simulator` means SES accepted the message into the
+ * How a send actually landed.
+ * `simulator` means SES accepted the message into the
  * mailbox simulator instead of the household's own address, so the family was not
  * reached. It is never a success and never rendered as one.
  */

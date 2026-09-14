@@ -2,12 +2,22 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCase } from "@/lib/cases";
-import { Check, LANGUAGE_NAME, Lot } from "@/lib/types";
 import {
-  evidenceBucket,
+  Case,
+  Check,
+  Delivery,
+  LANGUAGE_NAME,
+  Lot,
+  PullRecord,
+  Recipient,
+} from "@/lib/types";
+import {
+  DELIVERY_STATE,
+  deliveryLines,
   plural,
   productLine,
   stamp,
+  unreachedCount,
   urgencyMark,
 } from "@/lib/present";
 import { Masthead } from "../../masthead";
@@ -101,6 +111,121 @@ function LotBlock({ lot }: { lot: Lot }) {
   );
 }
 
+/** Never call a notice sent when part of the list was not reached. */
+function noticeCaption(c: Case): string {
+  if (!c.delivery) return "drafted, not sent yet";
+  const unreached = unreachedCount(
+    deliveryLines(c.notify.recipients, c.delivery),
+  );
+  if (unreached === 0) {
+    return `sent to all ${c.delivery.direct} households above`;
+  }
+  return `sent, but ${plural(unreached, "household", "households")} above did not receive it`;
+}
+
+function PullRecordBand({ record }: { record: PullRecord }) {
+  const short = record.units_expected - record.units_destroyed;
+  if (!record.complete) {
+    return (
+      <div className="band band-short">
+        <p className="band-statement">
+          The pull is short by {plural(short, "unit", "units")}.
+        </p>
+        <p className="band-detail">
+          {record.units_destroyed} of {record.units_expected} units destroyed by{" "}
+          {record.pulled_by}, {stamp(record.at)}. The rest are unaccounted for
+          and this case is not done.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="band band-done">
+      <div className="band-mark">pulled</div>
+      <p className="band-detail">
+        {record.units_destroyed} of {record.units_expected} units destroyed by{" "}
+        {record.pulled_by}, {stamp(record.at)}.
+      </p>
+    </div>
+  );
+}
+
+function DeliveryBlock({
+  delivery,
+  recipients,
+}: {
+  delivery: Delivery;
+  recipients: Recipient[];
+}) {
+  const lines = deliveryLines(recipients, delivery);
+  const unreached = unreachedCount(lines);
+
+  return (
+    <>
+      {unreached === 0 ? (
+        <div className="band band-done">
+          <div className="band-mark">delivered</div>
+          <p className="band-detail">
+            {delivery.direct} of {delivery.attempted} households reached
+            directly, {stamp(delivery.at)}, from {delivery.sender}.
+          </p>
+        </div>
+      ) : (
+        <div className="band band-short">
+          <p className="band-statement">
+            {unreached} of {lines.length} households were not reached.
+          </p>
+          <p className="band-detail">
+            {delivery.direct} reached directly, {delivery.simulator} diverted to
+            the mailbox simulator, {delivery.failed} failed to send. Phone the
+            households marked below. The notice did not arrive.
+          </p>
+        </div>
+      )}
+
+      <div className="deliveries">
+        {lines.map(({ recipient, message, state }) => {
+          const { mark, tone } = DELIVERY_STATE[state];
+          return (
+            <div className={`dl dl-${tone}`} key={recipient.household_id}>
+              <span className="dl-id">{recipient.household_id}</span>
+              <span className="dl-name">{recipient.name}</span>
+              <span className="dl-units num">{recipient.units}</span>
+              <span className="dl-mark">{mark}</span>
+              <span className="dl-meta">
+                {recipient.children_under_5 > 0 ? (
+                  <span className="hz">
+                    {recipient.children_under_5} under 5.{" "}
+                  </span>
+                ) : null}
+                {LANGUAGE_NAME[recipient.language] ?? recipient.language}.
+                {message ? (
+                  <>
+                    {" "}
+                    Sent to {message.to}
+                    {message.to !== message.intended
+                      ? `, not to ${message.intended}`
+                      : ""}
+                    .{" "}
+                    {message.message_id ? (
+                      <span className="dl-receipt">{message.message_id}</span>
+                    ) : null}
+                    {message.error ? (
+                      <span className="dl-error">{message.error}</span>
+                    ) : null}
+                  </>
+                ) : (
+                  " No send was attempted for this household."
+                )}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
 export default async function CasePage({ params }: Params) {
   const { caseId } = await params;
   const c = await getCase(caseId);
@@ -157,6 +282,7 @@ export default async function CasePage({ params }: Params) {
               {c.pull.locations.join(", ")}
             </span>
           </div>
+          {c.pull_record ? <PullRecordBand record={c.pull_record} /> : null}
           {c.pull.lots.map((lot) => (
             <LotBlock key={lot.lot_id} lot={lot} />
           ))}
@@ -195,7 +321,9 @@ export default async function CasePage({ params }: Params) {
       {c.notify.recipients.length > 0 ? (
         <section className="block">
           <div className="block-head">
-            <h2 className="block-title">Notify list</h2>
+            <h2 className="block-title">
+              {c.delivery ? "Notices sent" : "Notify list"}
+            </h2>
             <span className="block-note">
               {plural(c.notify.households, "household", "households")},{" "}
               {plural(c.notify.units, "unit", "units")} already in kitchens
@@ -204,6 +332,12 @@ export default async function CasePage({ params }: Params) {
                 : ""}
             </span>
           </div>
+          {c.delivery ? (
+            <DeliveryBlock
+              delivery={c.delivery}
+              recipients={c.notify.recipients}
+            />
+          ) : (
           <table className="households">
             <thead>
               <tr>
@@ -232,6 +366,7 @@ export default async function CasePage({ params }: Params) {
               ))}
             </tbody>
           </table>
+          )}
         </section>
       ) : null}
 
@@ -239,11 +374,7 @@ export default async function CasePage({ params }: Params) {
         <section className="block">
           <div className="block-head">
             <h2 className="block-title">Drafted notice</h2>
-            <span className="block-note">
-              {c.status === "notified"
-                ? "sent to each household above"
-                : "drafted, not sent yet"}
-            </span>
+            <span className="block-note">{noticeCaption(c)}</span>
           </div>
           <p className="notice">{c.notice_text}</p>
         </section>
@@ -263,14 +394,20 @@ export default async function CasePage({ params }: Params) {
             </div>
           ))}
         </div>
+        {c.evidence_uri ? (
+          <div className="evidence">
+            <div className="label">Compliance record</div>
+            <p className="evidence-uri">{c.evidence_uri}</p>
+          </div>
+        ) : null}
         <dl className="case-facts">
           <Field label="Opened" value={stamp(c.created_at)} />
           <Field label="Updated" value={stamp(c.updated_at)} />
-          {c.evidence_uri ? (
-            <Field
-              label="Compliance record"
-              value={evidenceBucket(c.evidence_uri)}
-            />
+          {c.delivery ? (
+            <Field label="Notices sent" value={stamp(c.delivery.at)} />
+          ) : null}
+          {c.pull_record ? (
+            <Field label="Shelf pulled" value={stamp(c.pull_record.at)} />
           ) : null}
         </dl>
       </section>
