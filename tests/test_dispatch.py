@@ -126,3 +126,32 @@ def test_ses_really_accepts_a_notice_for_a_verified_domain():
     assert record["mode"] == "direct", record
     assert record["to"] == "h0166@getava.xyz"
     assert record["message_id"]
+
+
+@pytest.mark.live
+def test_an_unverified_recipient_really_routes_to_the_simulator():
+    """The branch the live pantry data has never produced, exercised for real.
+
+    Every household on the real roster is at getava.xyz, a verified domain, so
+    every send this project has made so far came back `direct`. That left the
+    `simulator` path asserted only by the unit test above, which fakes SES.
+
+    This sends to an address SES sandbox will not accept for delivery and
+    checks the three things that have to be true at once: the notice really
+    went (a message id exists), it went to the simulator rather than the
+    household, and the record says so by keeping `intended` distinct from `to`.
+    A pantry reading this case later must be able to tell that this family was
+    not reached.
+    """
+    record = send_notice(
+        to="nobody@example.invalid",
+        subject="Best By simulator route check",
+        body="Verifying that an unreachable household routes to the simulator.",
+        household_id="H-TEST",
+        case_id="verify-simulator",
+    )
+    assert record["mode"] == "simulator", record
+    assert record["to"] == SIMULATOR
+    assert record["intended"] == "nobody@example.invalid"
+    assert record["intended"] != record["to"], "the record must not claim the household was reached"
+    assert record["message_id"]

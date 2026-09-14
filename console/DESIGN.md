@@ -205,6 +205,22 @@ delivered notice, so the mark says `NOT REACHED` and the row carries the same wa
 A summary band above the rows leads with the number that matters: "4 of 10 households were not
 reached." Never a percentage, never a success rate.
 
+**What is observed and what is not.** Stating this because the four states are not equally
+proven, and a spec that reads as uniformly verified when three quarters of it has never run in
+production is the same failure the `simulator` row exists to prevent.
+
+- `direct` is observed in production. Case `73a4bb419a7da04b` carries ten real SES message ids
+  from a real Lambda run, and the rendered page has been read back from the live URL.
+- The `simulator` **routing** is observed: `tests/test_dispatch.py::test_an_unverified_recipient_really_routes_to_the_simulator`
+  sends to an address SES sandbox will not accept, gets a real message id back, and asserts the
+  record keeps `intended` distinct from `to`. So the branch that decides a family was not reached
+  is exercised against real SES, not a fake.
+- The `simulator`, `failed` and `no record` **rows** have only been rendered against a doctored
+  scratch row, never against a production case, because every household on the real roster is at
+  a verified domain and every live send has come back `direct`. The CSS is unobserved in the
+  wild. If SES leaves the sandbox, or a send genuinely fails, that is the moment to look at the
+  real thing rather than trust this table.
+
 The same rule governs every caption downstream. The drafted notice is captioned from the delivery
 record, never from `status`, so a case whose status is `notified` but whose sends did not all land
 reads "sent, but 4 households above did not receive it".

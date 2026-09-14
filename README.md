@@ -385,21 +385,25 @@ Full suite, from a clean shell with no credentials and no API key:
 
 ```
 $ env -i PATH="$PATH" HOME="$HOME" .venv/bin/python -m pytest tests -q
-120 passed, 3 deselected in 1.23s
+120 passed, 4 deselected in 1.29s
 ```
 
-The 3 deselected are marked `@pytest.mark.live` because they hit the real model
+The 4 deselected are marked `@pytest.mark.live` because they hit the real model
 or real SES. They pass too, with credentials:
 
 ```
 $ .venv/bin/python -m pytest tests -q -m live
-3 passed, 120 deselected in 29.84s
+4 passed, 120 deselected in 20.91s
 ```
 
-Those three are the ones that prove the claims on this page: the vision model
+Those four are the ones that prove the claims on this page: the vision model
 reading `S88N D1M` off the real photograph, that read settling the real
-F-0617-2025 recall from NEEDS_EVIDENCE to MATCH, and SES returning a real message
-id. Every other test runs against real captured API responses in `data/`, never
+F-0617-2025 recall from NEEDS_EVIDENCE to MATCH, SES returning a real message id
+for a reachable household, and an unreachable household really routing to the
+mailbox simulator with `intended` kept distinct from `to`. That last one matters
+because it is the branch that decides a family was **not** reached, and it would
+otherwise never run: every household on this roster is at a verified domain, so
+every live send so far has come back `direct`. Every other test runs against real captured API responses in `data/`, never
 an invented fixture.
 
 ---
