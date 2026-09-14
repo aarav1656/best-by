@@ -8,11 +8,11 @@ import { Case, URGENCY_ORDER, Urgency } from "./types";
 
 export const PANTRY_ID = process.env.BESTBY_PANTRY_ID ?? "riverbend-dayton";
 const TABLE = process.env.BESTBY_TABLE ?? "bestby-cases";
-const REGION = process.env.BESTBY_AWS_REGION ?? "us-east-1";
+const REGION = process.env.BESTBY_AWS_REGION?.trim() || "us-east-1";
 
 function client(): DynamoDBDocumentClient {
-  const accessKeyId = process.env.BESTBY_AWS_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.BESTBY_AWS_SECRET_ACCESS_KEY;
+  const accessKeyId = process.env.BESTBY_AWS_ACCESS_KEY_ID?.trim();
+  const secretAccessKey = process.env.BESTBY_AWS_SECRET_ACCESS_KEY?.trim();
   const base = new DynamoDBClient({
     region: REGION,
     credentials:

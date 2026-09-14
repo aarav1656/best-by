@@ -31,7 +31,7 @@ function Record({ c }: { c: Case }) {
             <div className="ob ob-pull">
               <div className="label">Pull</div>
               <div className="ob-count">
-                {pullUnits}
+                {pullUnits}{" "}
                 <span>{pullUnits === 1 ? "unit" : "units"}</span>
               </div>
               <div className="ob-where">
@@ -45,7 +45,7 @@ function Record({ c }: { c: Case }) {
             <div className="ob ob-notify">
               <div className="label">Notify</div>
               <div className="ob-count">
-                {notifyHouseholds}
+                {notifyHouseholds}{" "}
                 <span>
                   {notifyHouseholds === 1 ? "household" : "households"}
                 </span>
@@ -65,7 +65,7 @@ function Record({ c }: { c: Case }) {
             <div className="ob ob-look">
               <div className="label">Go look</div>
               <div className="ob-count">
-                {errands}
+                {errands}{" "}
                 <span>{errands === 1 ? "lot" : "lots"}</span>
               </div>
               <div className="ob-where">

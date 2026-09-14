@@ -551,8 +551,9 @@
   .lot-grid {
     margin-top: 14px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
-    gap: 14px 22px;
+    grid-template-columns: repeat(auto-fit, minmax(144px, 1fr));
+    gap: 16px 22px;
+    align-items: start;
   }
 
   .checks {
@@ -561,9 +562,18 @@
     padding-top: 4px;
   }
 
+  .check-by {
+    display: block;
+    margin-top: 2px;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+    word-break: break-word;
+  }
+
   .check {
     display: grid;
-    grid-template-columns: 20px 130px 1fr;
+    grid-template-columns: 20px 172px 1fr;
     gap: 12px;
     padding: 9px 0 9px 10px;
     border-left: 2px solid transparent;

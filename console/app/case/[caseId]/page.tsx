@@ -44,10 +44,19 @@ function Field({
 }
 
 function CheckRow({ check }: { check: Check }) {
+  const open = check.name.indexOf("[");
+  const name = (open === -1 ? check.name : check.name.slice(0, open)).replace(
+    /_/g,
+    " ",
+  );
+  const by = open === -1 ? null : check.name.slice(open + 1).replace(/]$/, "");
   return (
     <div className={`check ${check.passed ? "passed" : "failed"}`}>
       <span className="check-mark">{check.passed ? "yes" : "no"}</span>
-      <span className="check-name">{check.name.replace(/_/g, " ")}</span>
+      <span className="check-name">
+        {name}
+        {by ? <span className="check-by">{by}</span> : null}
+      </span>
       <span className="check-detail">{check.detail}</span>
     </div>
   );
@@ -230,7 +239,11 @@ export default async function CasePage({ params }: Params) {
         <section className="block">
           <div className="block-head">
             <h2 className="block-title">Drafted notice</h2>
-            <span className="block-note">sent to each household above</span>
+            <span className="block-note">
+              {c.status === "notified"
+                ? "sent to each household above"
+                : "drafted, not sent yet"}
+            </span>
           </div>
           <p className="notice">{c.notice_text}</p>
         </section>

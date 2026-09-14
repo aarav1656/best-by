@@ -1,0 +1,609 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Best By",
+    "output": "architecture.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/kamalbuilds/best-by",
+      "revision": "5293e2b197819a92fc13e16300f354b15d7d1d6e"
+    },
+    "viewBox": [
+      1360,
+      900
+    ],
+    "views": [
+      {
+        "id": "the-inversion",
+        "label": "The lot code is captured at intake",
+        "focus": [
+          "volunteer",
+          "label",
+          "shelf",
+          "extractor",
+          "verdict"
+        ],
+        "note": "The stamped code is photographed when the donation is booked in. Six weeks later the recall comparison is an exact string match, not a hunt."
+      },
+      {
+        "id": "unattended",
+        "label": "The morning run",
+        "focus": [
+          "scheduler",
+          "lambda",
+          "openfda",
+          "extractor",
+          "verdict",
+          "sweep",
+          "dynamo",
+          "s3"
+        ],
+        "note": "What happens at 07:00 with nobody watching: every open enforcement report read, every lot compared, two obligations written per recall."
+      },
+      {
+        "id": "the-gate",
+        "label": "The gate on notification",
+        "focus": [
+          "agent",
+          "verdict",
+          "veto",
+          "gate",
+          "ses",
+          "coordinator"
+        ],
+        "note": "The model reads product identity. The verdict engine decides. The hook cancels any notification that is not a confirmed match."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "volunteer",
+      "type": "external",
+      "label": "Volunteer at intake",
+      "sublabel": "photographs the case panel",
+      "tag": "weeks before any recall",
+      "pos": [
+        40,
+        52
+      ],
+      "size": [
+        185,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/shelf.py",
+          "line": 70,
+          "label": "ShelfLot.label_photo"
+        }
+      ]
+    },
+    {
+      "id": "label",
+      "type": "backend",
+      "label": "Intake photo read",
+      "sublabel": "stamped code off the panel",
+      "tag": "reports unreadable, never guesses",
+      "pos": [
+        280,
+        52
+      ],
+      "size": [
+        195,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/label.py",
+          "line": 229,
+          "label": "read_label"
+        }
+      ]
+    },
+    {
+      "id": "shelf",
+      "type": "database",
+      "label": "Pantry intake log",
+      "sublabel": "lots, distributions, households",
+      "tag": "23 lots, 2,239 on shelf, 319 out",
+      "pos": [
+        535,
+        52
+      ],
+      "size": [
+        210,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/shelf.py",
+          "line": 118,
+          "label": "Pantry"
+        }
+      ]
+    },
+    {
+      "id": "openfda",
+      "type": "external",
+      "label": "openFDA food enforcement",
+      "sublabel": "api.fda.gov",
+      "tag": "live, no auth",
+      "pos": [
+        40,
+        218
+      ],
+      "size": [
+        185,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/feeds/openfda.py",
+          "line": 424,
+          "label": "fetch"
+        }
+      ]
+    },
+    {
+      "id": "extractor",
+      "type": "backend",
+      "label": "Identifier extractor",
+      "sublabel": "code_info prose to checkable facts",
+      "tag": "27.0% carry nothing checkable",
+      "pos": [
+        280,
+        218
+      ],
+      "size": [
+        195,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/feeds/openfda.py",
+          "line": 370,
+          "label": "extract_identifiers"
+        }
+      ]
+    },
+    {
+      "id": "verdict",
+      "type": "backend",
+      "label": "Verdict engine",
+      "sublabel": "MATCH, NEEDS_EVIDENCE, NO_MATCH",
+      "tag": "no prompt reaches it",
+      "pos": [
+        535,
+        218
+      ],
+      "size": [
+        210,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/engine/verdict.py",
+          "line": 241,
+          "label": "decide"
+        }
+      ]
+    },
+    {
+      "id": "sweep",
+      "type": "backend",
+      "label": "Pull / notify split",
+      "sublabel": "one verdict, two obligations",
+      "tag": "grouped per recall",
+      "pos": [
+        805,
+        218
+      ],
+      "size": [
+        200,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/engine/sweep.py",
+          "line": 252,
+          "label": "sweep"
+        }
+      ]
+    },
+    {
+      "id": "veto",
+      "type": "security",
+      "label": "NotifyVeto",
+      "sublabel": "BeforeToolCallEvent hook",
+      "tag": "cancels notify_households",
+      "pos": [
+        1065,
+        218
+      ],
+      "size": [
+        195,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/bestby_agent.py",
+          "line": 151,
+          "label": "NotifyVeto"
+        }
+      ]
+    },
+    {
+      "id": "scheduler",
+      "type": "cloud",
+      "label": "EventBridge Scheduler",
+      "sublabel": "cron(0 11 * * ? *)",
+      "tag": "07:00 Dayton, before the doors open",
+      "pos": [
+        40,
+        396
+      ],
+      "size": [
+        185,
+        72
+      ],
+      "sources": [
+        {
+          "path": "infra/deploy.sh",
+          "line": 197,
+          "label": "bestby-daily"
+        }
+      ]
+    },
+    {
+      "id": "lambda",
+      "type": "cloud",
+      "label": "AWS Lambda",
+      "sublabel": "bestby-run",
+      "pos": [
+        280,
+        396
+      ],
+      "size": [
+        195,
+        72
+      ],
+      "sources": [
+        {
+          "path": "infra/lambda_handler.py",
+          "line": 81,
+          "label": "handler"
+        }
+      ]
+    },
+    {
+      "id": "agent",
+      "type": "backend",
+      "label": "Strands agent",
+      "sublabel": "10 tools, reads product identity",
+      "tag": "Anthropic API, not Bedrock",
+      "pos": [
+        535,
+        396
+      ],
+      "size": [
+        210,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/bestby_agent.py",
+          "line": 312,
+          "label": "build_agent"
+        }
+      ]
+    },
+    {
+      "id": "gate",
+      "type": "security",
+      "label": "Approval gate",
+      "sublabel": "HumanInTheLoop intervention",
+      "tag": "allowed_tools [\"*\", \"!notify_households\"]",
+      "pos": [
+        1065,
+        396
+      ],
+      "size": [
+        195,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/bestby_agent.py",
+          "line": 214,
+          "label": "approval_gate"
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "type": "cloud",
+      "label": "S3 evidence",
+      "sublabel": "bestby-evidence-079415246611",
+      "tag": "what an inspector asks for",
+      "pos": [
+        280,
+        574
+      ],
+      "size": [
+        195,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/compliance.py",
+          "line": 169,
+          "label": "put_record"
+        }
+      ]
+    },
+    {
+      "id": "dynamo",
+      "type": "database",
+      "label": "DynamoDB",
+      "sublabel": "bestby-cases, bestby-recalls",
+      "tag": "PK pantry_id, SK case_id",
+      "pos": [
+        535,
+        574
+      ],
+      "size": [
+        210,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/store.py",
+          "line": 72,
+          "label": "CaseStore"
+        }
+      ]
+    },
+    {
+      "id": "ses",
+      "type": "cloud",
+      "label": "Amazon SES",
+      "sublabel": "recall notice per household",
+      "tag": "bestby@getava.xyz",
+      "pos": [
+        1065,
+        574
+      ],
+      "size": [
+        195,
+        72
+      ],
+      "sources": [
+        {
+          "path": "agent/dispatch.py",
+          "line": 74,
+          "label": "send_notice"
+        }
+      ]
+    },
+    {
+      "id": "console",
+      "type": "frontend",
+      "label": "Console on Vercel",
+      "sublabel": "the decision queue",
+      "tag": "healthy state is empty",
+      "pos": [
+        535,
+        752
+      ],
+      "size": [
+        210,
+        72
+      ],
+      "sources": [
+        {
+          "path": "console/lib/cases.ts",
+          "line": 10,
+          "label": "reads bestby-cases"
+        }
+      ]
+    },
+    {
+      "id": "coordinator",
+      "type": "external",
+      "label": "Coordinator",
+      "sublabel": "one decision per recall",
+      "pos": [
+        805,
+        752
+      ],
+      "size": [
+        200,
+        72
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "AWS us-east-1 (AISPL: no Bedrock, no AgentCore)",
+      "wraps": [
+        "scheduler",
+        "lambda",
+        "s3",
+        "dynamo"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "photo",
+      "from": "volunteer",
+      "to": "label",
+      "label": "case panel photo",
+      "variant": "emphasis"
+    },
+    {
+      "id": "transcribed",
+      "from": "label",
+      "to": "shelf",
+      "label": "lot code, best by, UPC"
+    },
+    {
+      "id": "held",
+      "from": "shelf",
+      "to": "verdict",
+      "label": "what is held, what went out",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "reports",
+      "from": "openfda",
+      "to": "extractor",
+      "label": "614 open reports"
+    },
+    {
+      "id": "facts",
+      "from": "extractor",
+      "to": "verdict",
+      "label": "lot codes, UPCs, dates, states"
+    },
+    {
+      "id": "ruling",
+      "from": "verdict",
+      "to": "sweep",
+      "label": "verdict per lot"
+    },
+    {
+      "id": "pull",
+      "from": "sweep",
+      "to": "agent",
+      "label": "PULL: units still on the shelf",
+      "variant": "emphasis"
+    },
+    {
+      "id": "notify",
+      "from": "sweep",
+      "to": "veto",
+      "label": "NOTIFY: units already taken home",
+      "variant": "security"
+    },
+    {
+      "id": "tick",
+      "from": "scheduler",
+      "to": "lambda",
+      "label": "daily tick"
+    },
+    {
+      "id": "pass",
+      "from": "lambda",
+      "to": "agent",
+      "label": "one pass",
+      "variant": "emphasis"
+    },
+    {
+      "id": "identity",
+      "from": "agent",
+      "to": "verdict",
+      "label": "product identity only",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "attempt",
+      "from": "agent",
+      "to": "veto",
+      "label": "notify_households",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "held-back",
+      "from": "veto",
+      "to": "gate",
+      "label": "MATCH, distribution, drafted notice",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "approved",
+      "from": "gate",
+      "to": "ses",
+      "label": "coordinator approved",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "record",
+      "from": "agent",
+      "to": "s3",
+      "label": "disposal record",
+      "variant": "dashed",
+      "fromSide": "left",
+      "toSide": "top"
+    },
+    {
+      "id": "cases",
+      "from": "agent",
+      "to": "dynamo",
+      "label": "one case per recall",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "queue",
+      "from": "dynamo",
+      "to": "console",
+      "label": "open cases",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "ask",
+      "from": "console",
+      "to": "coordinator",
+      "label": "pull list and notify list"
+    },
+    {
+      "id": "decision",
+      "from": "coordinator",
+      "to": "gate",
+      "label": "approve before any household is contacted",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "right"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "What the model decides",
+      "items": [
+        "Whether an intake lot and a recall notice describe one food",
+        "How to word the notice a household actually receives",
+        "Which single thing to send a volunteer to read off the case"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "What it can never decide",
+      "items": [
+        "Whether the lot code on the shelf matches the one in the notice",
+        "Whether Ohio falls inside the recall's distribution",
+        "Whether a household may be contacted at all"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Why the photograph is taken at intake",
+      "items": [
+        "Of 2,547 captured reports, 32.5% carry a lot code and 37.4% a UPC",
+        "27.0% name nothing checkable, so the shelf side has to be exact",
+        "Code read at booking, matched six weeks later as a string"
+      ]
+    }
+  ]
+}
