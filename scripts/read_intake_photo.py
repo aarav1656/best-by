@@ -21,7 +21,7 @@ from datetime import date
 from agent.engine.sweep import candidates
 from agent.engine.verdict import Outcome, decide
 from agent.feeds.openfda import fetch, load_captured
-from agent.label import apply_reading, parse_printed_date, read_label
+from agent.label import apply_reading, read_label
 from agent.shelf import ShelfLot
 
 CORPUS = "data/fda_food_enforcement_2025_2026.json"

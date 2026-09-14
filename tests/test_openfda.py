@@ -9,17 +9,7 @@ from __future__ import annotations
 
 from datetime import date
 
-import pytest
-
-from agent.feeds.openfda import (
-    _extract_best_by,
-    _extract_lot_codes,
-    _extract_scope,
-    _extract_states,
-    _extract_upcs,
-    extract_identifiers,
-    parse_recall,
-)
+from agent.feeds.openfda import _extract_best_by, _extract_lot_codes, extract_identifiers
 
 
 def test_lot_codes_from_a_comma_separated_list(by_number):

@@ -25,8 +25,6 @@ If a change makes this file pass more easily, the change is wrong.
 
 from __future__ import annotations
 
-from dataclasses import replace
-
 import pytest
 
 from agent.bestby_agent import FileSink, Ledger, NotifyVeto, build_agent

@@ -9,14 +9,9 @@ stayed in distribution.
 
 from __future__ import annotations
 
-from datetime import date
-
-import pytest
-
 from agent.casefile import build_case
 from agent.compliance import render_record
 from agent.engine.sweep import Interruption, exposure
-from agent.shelf import load_pantry
 from agent.store import _from_dynamo, _to_dynamo, case_id
 
 

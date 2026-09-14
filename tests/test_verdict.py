@@ -9,10 +9,6 @@ is not the recalled batch, keep handing it out", and being right.
 from __future__ import annotations
 
 from dataclasses import replace
-from datetime import date
-
-import pytest
-
 from agent.engine.verdict import IdentityAssertion, Outcome, decide
 
 

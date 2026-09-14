@@ -41,7 +41,7 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -56,7 +56,6 @@ from agent.engine.sweep import Exposure, Interruption, candidates, exposure
 from agent.engine.verdict import IdentityAssertion, Outcome, Verdict
 from agent.feeds.base import Recall
 from agent.shelf import Pantry, ShelfLot
-from agent.store import case_id as make_case_id
 
 MODEL_ID = os.environ.get("BESTBY_MODEL", "claude-sonnet-4-5-20250929")
 DATA = Path(__file__).parent.parent / "data"

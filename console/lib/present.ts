@@ -1,4 +1,13 @@
-import { Case, Lot, Urgency, URGENCY_WORD } from "./types";
+import {
+  Case,
+  Delivery,
+  DeliveryMessage,
+  DeliveryMode,
+  Lot,
+  Recipient,
+  Urgency,
+  URGENCY_WORD,
+} from "./types";
 
 export function urgencyMark(u: Urgency | string): string {
   const word = URGENCY_WORD[u as Urgency];
@@ -36,6 +45,42 @@ export function stamp(iso: string | null): string {
   )} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())} UTC`;
 }
 
-export function evidenceBucket(uri: string): string {
-  return uri.replace(/^s3:\/\//, "");
+/**
+ * How a send actually landed. `simulator` means SES accepted the message into the
+ * mailbox simulator instead of the household's own address, so the family was not
+ * reached. It is never a success and never rendered as one.
+ */
+export const DELIVERY_STATE: Record<
+  DeliveryMode | "missing",
+  { mark: string; tone: "act" | "wait" | "hazard" }
+> = {
+  direct: { mark: "reached", tone: "act" },
+  simulator: { mark: "not reached", tone: "wait" },
+  failed: { mark: "send failed", tone: "hazard" },
+  missing: { mark: "no record", tone: "hazard" },
+};
+
+export interface DeliveryLine {
+  recipient: Recipient;
+  message: DeliveryMessage | null;
+  state: DeliveryMode | "missing";
+}
+
+/** Join the notify roster to what SES actually did, keeping every household. */
+export function deliveryLines(
+  recipients: Recipient[],
+  delivery: Delivery,
+): DeliveryLine[] {
+  const byHousehold = new Map(delivery.messages.map((m) => [m.household_id, m]));
+  const lines: DeliveryLine[] = recipients.map((recipient) => {
+    const message = byHousehold.get(recipient.household_id) ?? null;
+    byHousehold.delete(recipient.household_id);
+    return { recipient, message, state: message ? message.mode : "missing" };
+  });
+  return lines;
+}
+
+/** Households the notice did not reach, for any reason. */
+export function unreachedCount(lines: DeliveryLine[]): number {
+  return lines.filter((l) => l.state !== "direct").length;
 }
