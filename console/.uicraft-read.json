@@ -1,13 +1,13 @@
 {
-  "as": "decision queue for a food pantry coordinator deciding what to pull off the shelf and which households to call, register of a public health notice",
+  "as": "shift console for a pantry recall coordinator: overview, printable pull sheet, pass history",
   "dials": "8/5/3",
   "type": "Literata + JetBrains Mono",
-  "surface": "cool pale paper, no cream",
+  "surface": "cool pale paper",
   "accent": "deep teal act, oxblood hazard",
   "radius": "2",
   "showpiece": "none",
   "direction": "design-taste-frontend",
   "review": "anti-ai-slop-frontend",
   "cwd": "/Users/kamal/Desktop/best-by/console",
-  "ts": "2026-09-14T12:05:28Z"
+  "ts": "2026-09-14T13:12:38Z"
 }

@@ -7,8 +7,10 @@ import {
 import { Case, URGENCY_ORDER, Urgency } from "./types";
 
 export const PANTRY_ID = process.env.BESTBY_PANTRY_ID ?? "riverbend-dayton";
-const TABLE = process.env.BESTBY_TABLE ?? "bestby-cases";
-const REGION = process.env.BESTBY_AWS_REGION?.trim() || "us-east-1";
+export const TABLE = process.env.BESTBY_TABLE ?? "bestby-cases";
+export const RECALLS_TABLE =
+  process.env.BESTBY_RECALLS_TABLE ?? "bestby-recalls";
+export const REGION = process.env.BESTBY_AWS_REGION?.trim() || "us-east-1";
 
 function client(): DynamoDBDocumentClient {
   const accessKeyId = process.env.BESTBY_AWS_ACCESS_KEY_ID?.trim();
@@ -53,9 +55,17 @@ function normalise(raw: Record<string, unknown>): Case {
 export interface QueueResult {
   cases: Case[];
   error: string | null;
+  /** Where the rows above came from, so the footer can attest it. */
+  read: { table: string; region: string; pantry: string; at: string };
 }
 
 export async function listCases(): Promise<QueueResult> {
+  const read = {
+    table: TABLE,
+    region: REGION,
+    pantry: PANTRY_ID,
+    at: new Date().toISOString(),
+  };
   try {
     const out = await client().send(
       new QueryCommand({
@@ -76,9 +86,42 @@ export async function listCases(): Promise<QueueResult> {
       if (pa !== pb) return pb - pa;
       return a.recall.recall_number.localeCompare(b.recall.recall_number);
     });
-    return { cases, error: null };
+    return { cases, error: null, read };
   } catch (e) {
-    return { cases: [], error: e instanceof Error ? e.message : String(e) };
+    return {
+      cases: [],
+      error: e instanceof Error ? e.message : String(e),
+      read,
+    };
+  }
+}
+
+/**
+ * How many FDA notices this pantry has been screened against. Every notice the
+ * pass has ever read is recorded, matched or not, so this is the denominator
+ * behind the ten cases on the queue.
+ */
+export async function countNoticesOnFile(): Promise<number | null> {
+  try {
+    let seen = 0;
+    let cursor: Record<string, unknown> | undefined;
+    do {
+      const out = await client().send(
+        new QueryCommand({
+          TableName: RECALLS_TABLE,
+          KeyConditionExpression: "#s = :s",
+          ExpressionAttributeNames: { "#s": "source" },
+          ExpressionAttributeValues: { ":s": "openFDA" },
+          ProjectionExpression: "recall_number",
+          ExclusiveStartKey: cursor,
+        }),
+      );
+      seen += out.Count ?? 0;
+      cursor = out.LastEvaluatedKey;
+    } while (cursor);
+    return seen;
+  } catch {
+    return null;
   }
 }
 

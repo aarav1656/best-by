@@ -46,6 +46,20 @@ export function stamp(iso: string | null): string {
 }
 
 /**
+ * Same stamp, to the second. Two passes can start twenty two seconds apart, and
+ * a page that prints both as the same minute is claiming they were one run.
+ */
+export function stampExact(iso: string | null): string {
+  if (!iso) return "not recorded";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(
+    d.getUTCDate(),
+  )} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())} UTC`;
+}
+
+/**
  * How a send actually landed.
  * `simulator` means SES accepted the message into the
  * mailbox simulator instead of the household's own address, so the family was not
