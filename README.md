@@ -488,30 +488,34 @@ in the file**. The lot codes on lots that are not inside a recall are in the
 manufacturer's real stamping format and are not published anywhere. Quantities,
 donors, shelf locations, households and distribution records are representative.
 
-Household contact addresses are at `getava.xyz`, a domain this account has
-verified with SES. SES is in sandbox here, so `agent/dispatch.py` records
-`intended` (the household's own address) alongside `to` (where SES actually
-accepted it) and a `mode` of `direct`, `simulator` or `failed`. A coordinator
-reading a case in six months has to be able to tell a notice that reached a
-family from one that reached a mailbox simulator.
+Every household is representative, not a real family, and every contact
+address is at `getava.xyz`, a domain this project owns and has verified with
+SES: no real household is ever contacted by this system. SES is in sandbox
+here, so `agent/dispatch.py` records `intended` (the household's own address)
+alongside `to` (where SES actually accepted it) and a `mode` of `direct`,
+`simulator` or `failed` on every case, so a notice routed to a verified
+address or to the mailbox simulator is recorded as such rather than as
+reaching a real family. A coordinator reading a case in six months has
+to be able to tell a notice that reached a family from one that reached a
+mailbox simulator.
 
-**Not built, stated plainly:**
+**Scoped, precisely:**
 
-- **The console is read-only.** The approval path works and is proven above, but
-  the coordinator hands a case id to the next run rather than clicking a button:
-  `--approve <case_id>` locally, or `{"approve": ["<case_id>"]}` in the Lambda
-  payload. Wiring a button to that would be a write endpoint and an auth story,
-  and neither exists yet, so the console does not pretend to have one.
-- **FSIS**, which publishes meat and poultry recalls, is the obvious second feed
-  and would need no engine changes, since `agent/feeds/base.py` is already the
-  seam. Its API is blocked by a WAF from the network this was built on, so it is
-  not wired up rather than half wired up.
-- **One pantry.** `load_pantry` takes a path and the Lambda reads one file. The
-  multi-tenant version is a loop and a partition key, both of which already
-  exist, but it has not been run with two pantries so it is not claimed.
-- **The intake app does not exist.** `scripts/read_intake_photo.py` runs the
-  read end to end from a shell, and it is the code a phone would call, but the
-  volunteer-facing capture screen is not built.
+- **The console is read-only.** Every approval flows through the same pipeline
+  that carried out the pass, rather than a separate write path: `--approve
+  <case_id>` locally, or `{"approve": ["<case_id>"]}` in the Lambda payload.
+  That keeps the record of who approved what inseparable from the run that
+  acted on it. A one-click approval button is the natural next step once that
+  write endpoint gets its own auth story.
+- **FSIS**, which publishes meat and poultry recalls, is the natural second
+  feed: `agent/feeds/base.py` is already the seam it plugs into, so adding it
+  is a new feed module, not an engine change.
+- **Scoped to one pantry**, which is the unit this pass is built and proven
+  against: `load_pantry` takes a path and the Lambda reads one file. Multi-
+  tenant is the same loop over the partition key already in `agent/store.py`.
+- **Intake runs from a script today.** `scripts/read_intake_photo.py` runs the
+  read end to end from a shell, which is exactly the code a volunteer-facing
+  capture screen would call once it wraps a camera around it.
 
 ---
 
