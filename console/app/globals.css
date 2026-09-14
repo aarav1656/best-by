@@ -2,44 +2,46 @@
 
 @layer base {
   :root {
-    --paper: #eef1f0;
-    --sheet: #fafbfa;
-    --sheet-2: #e4e8e7;
-    --ink: #13181a;
-    --ink-2: #434a4c;
-    --ink-3: #6a7274;
-    --rule: #d7dcdb;
-    --rule-strong: #bec5c3;
-    --act: #0f4b4a;
-    --on-act: #f5faf9;
-    --hazard: #8a1c16;
-    --wait: #6f4a0c;
+    --paper: #F1E8D8;
+    --sheet: #FAF6EE;
+    --sheet-2: #E6DCC8;
+    --ink: #1A1510;
+    --ink-2: #5A5044;
+    --ink-3: #8A7E6E;
+    --rule: #D4C8B0;
+    --rule-strong: #C4B89A;
+    --stamp: #1B2A5A;
+    --on-stamp: #F7F4EC;
+    --hazard: #8A1C16;
+    --wait: #7A4E0C;
 
-    --t-statement: clamp(29px, 2.1vw + 17px, 40px);
-    --t-record: clamp(20px, 0.8vw + 16px, 24px);
-    --t-hazard: clamp(16px, 0.4vw + 14.5px, 18px);
+    --t-statement: clamp(28px, 2vw + 16px, 38px);
+    --t-record: clamp(18px, 0.6vw + 15px, 22px);
+    --t-hazard: clamp(16px, 0.4vw + 14.5px, 17px);
+    --t-stamp: clamp(22px, 2vw + 12px, 36px);
+    --t-count: 28px;
 
     --serif: ui-serif, Georgia, serif;
     --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
-    --radius: 2px;
+    --radius: 1px;
     color-scheme: light dark;
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
-      --paper: #101314;
-      --sheet: #171b1c;
-      --sheet-2: #1e2324;
-      --ink: #e6eae9;
-      --ink-2: #a5abaa;
-      --ink-3: #79817f;
-      --rule: #282d2e;
-      --rule-strong: #383e3f;
-      --act: #54a8a0;
-      --on-act: #0a1513;
-      --hazard: #de7c73;
-      --wait: #ce9c48;
+      --paper: #161310;
+      --sheet: #1E1A16;
+      --sheet-2: #2A241C;
+      --ink: #F0E8DA;
+      --ink-2: #B8AE9E;
+      --ink-3: #8A8070;
+      --rule: #3A3228;
+      --rule-strong: #4A4034;
+      --stamp: #8FA4E0;
+      --on-stamp: #0E1220;
+      --hazard: #E08078;
+      --wait: #D3A24E;
     }
   }
 
@@ -90,7 +92,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--act);
+    outline: 2px solid var(--stamp);
     outline-offset: 2px;
   }
 }
@@ -155,6 +157,12 @@
     color: var(--ink);
   }
 
+  .masthead-pantry-inline {
+    color: var(--ink-3);
+    letter-spacing: 0.14em;
+    font-weight: 400;
+  }
+
   .masthead-nav {
     display: flex;
     gap: 20px;
@@ -175,8 +183,8 @@
   }
 
   .nav-link.here {
-    color: var(--ink);
-    border-bottom-color: var(--act);
+    color: var(--stamp);
+    border-bottom-color: var(--stamp);
   }
 
   .masthead-pantry {
@@ -185,6 +193,162 @@
     letter-spacing: 0.04em;
     color: var(--ink-3);
     text-align: right;
+  }
+
+  /* Stamp & Sheet: dual obligation panels + lot stamp ------------------- */
+
+  .sheets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 28px 0 8px;
+  }
+
+  @media (max-width: 720px) {
+    .sheets {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .sheet-panel {
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 20px 22px 22px;
+  }
+
+  .sheet-panel .lbl {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+  }
+
+  .sheet-panel .count {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: var(--t-count);
+    font-size: 40px;
+    font-variant-numeric: tabular-nums;
+    color: var(--stamp);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .sheet-panel .verb {
+    font-family: var(--serif);
+    font-size: 17px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.35;
+  }
+
+  .sheet-panel .meta {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  .sheet-panel .meta .hot {
+    color: var(--hazard);
+  }
+
+  .sheet-panel .cta {
+    display: inline-block;
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--stamp);
+    color: var(--on-stamp);
+    padding: 10px 14px;
+    border: 1px solid var(--stamp);
+    border-radius: var(--radius);
+    text-decoration: none;
+  }
+
+  .sheet-panel .cta:hover {
+    filter: brightness(1.08);
+  }
+
+  .sheet-panel.kitchens .cta {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--rule);
+  }
+
+  .lot-stamp {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: var(--t-stamp);
+    letter-spacing: 0.04em;
+    color: var(--stamp);
+    background: color-mix(in srgb, var(--stamp) 7%, transparent);
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 0 0 12px;
+    border: 1px solid color-mix(in srgb, var(--stamp) 25%, transparent);
+    border-radius: var(--radius);
+    font-variant-numeric: tabular-nums;
+    animation: stamp-settle 280ms ease-out both;
+  }
+
+  .lot-stamp.look {
+    color: var(--wait);
+    background: color-mix(in srgb, var(--wait) 8%, transparent);
+    border-color: color-mix(in srgb, var(--wait) 35%, transparent);
+  }
+
+  @keyframes stamp-settle {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lot-stamp {
+      animation: none;
+    }
+  }
+
+  .cleared-stamp {
+    display: inline-block;
+    margin-top: 22px;
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--stamp);
+    border: 2px solid var(--stamp);
+    padding: 10px 16px;
+    border-radius: var(--radius);
+  }
+
+  .pull-code {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 18px;
+    letter-spacing: 0.04em;
+    color: var(--stamp);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .signoff-stamp {
+    border: 2px solid var(--stamp);
+    color: var(--stamp);
+    padding: 14px 16px;
+    margin-top: 24px;
+    border-radius: var(--radius);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
   /* the position, read before a single card ----------------------------- */
@@ -284,18 +448,18 @@
     font-size: 11px;
     letter-spacing: 0.11em;
     text-transform: uppercase;
-    color: var(--act);
+    color: var(--stamp);
     border-bottom: 1px solid transparent;
     padding-bottom: 2px;
   }
 
   .act-link:hover {
-    border-bottom-color: var(--act);
+    border-bottom-color: var(--stamp);
   }
 
   .btn {
-    background: var(--act);
-    color: var(--on-act);
+    background: var(--stamp);
+    color: var(--on-stamp);
     border: 0;
     border-radius: var(--radius);
     padding: 9px 14px;
@@ -312,12 +476,12 @@
   }
 
   .inline-link {
-    color: var(--act);
+    color: var(--stamp);
     border-bottom: 1px solid var(--rule-strong);
   }
 
   .inline-link:hover {
-    border-bottom-color: var(--act);
+    border-bottom-color: var(--stamp);
   }
 
   .position-note {
@@ -372,7 +536,7 @@
   .chip.on {
     color: var(--ink);
     border-color: var(--rule-strong);
-    box-shadow: inset 0 -2px 0 var(--act);
+    box-shadow: inset 0 -2px 0 var(--stamp);
   }
 
   .filter-state {
@@ -447,7 +611,7 @@
   }
 
   .same-shelf-links .record-open:hover {
-    border-bottom-color: var(--act);
+    border-bottom-color: var(--stamp);
   }
 
   .record-hazard {
@@ -466,13 +630,13 @@
     font-size: 11px;
     letter-spacing: 0.11em;
     text-transform: uppercase;
-    color: var(--act);
+    color: var(--stamp);
     border-bottom: 1px solid transparent;
     padding-bottom: 2px;
   }
 
   .record:hover .record-open {
-    border-bottom-color: var(--act);
+    border-bottom-color: var(--stamp);
   }
 
   .rail {
@@ -521,8 +685,8 @@
   }
 
   .ob-pull {
-    background: var(--act);
-    color: var(--on-act);
+    background: var(--stamp);
+    color: var(--on-stamp);
   }
 
   .ob-notify {
@@ -532,9 +696,9 @@
   }
 
   .ob-look {
-    background: var(--sheet-2);
-    color: var(--ink);
-    border-left: 2px solid var(--wait);
+    background: transparent;
+    color: var(--wait);
+    border: 1px solid var(--wait);
   }
 
   .ob-look .label {
@@ -781,7 +945,7 @@
     font-size: 12px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--act);
+    color: var(--stamp);
     white-space: nowrap;
   }
 
@@ -848,7 +1012,7 @@
   }
 
   .check.passed .check-mark {
-    color: var(--act);
+    color: var(--stamp);
   }
 
   .decided {
@@ -963,7 +1127,7 @@
   }
 
   .band-done {
-    border-left-color: var(--act);
+    border-left-color: var(--stamp);
   }
 
   .band-short {
@@ -976,7 +1140,7 @@
     font-size: 10.5px;
     letter-spacing: 0.11em;
     text-transform: uppercase;
-    color: var(--act);
+    color: var(--stamp);
   }
 
   .band-statement {
@@ -1060,8 +1224,8 @@
     font-weight: 500;
   }
 
-  .dl-act .dl-mark {
-    color: var(--act);
+  .dl-stamp .dl-mark {
+    color: var(--stamp);
   }
 
   .dl-wait {
@@ -1138,7 +1302,7 @@
 
   .closed-outcome {
     text-align: right;
-    color: var(--act);
+    color: var(--stamp);
   }
 
   .closed-outcome.hz {
@@ -1288,8 +1452,8 @@
   }
 
   .tick:checked {
-    background: var(--act);
-    border-color: var(--act);
+    background: var(--stamp);
+    border-color: var(--stamp);
   }
 
   .tick:checked::after {
@@ -1299,7 +1463,7 @@
     top: 2px;
     width: 5px;
     height: 10px;
-    border: solid var(--on-act);
+    border: solid var(--on-stamp);
     border-width: 0 2px 2px 0;
     transform: rotate(43deg);
   }
@@ -1628,8 +1792,8 @@
       --ink-3: #4a5153;
       --rule: #bcc2c1;
       --rule-strong: #767c7b;
-      --act: #0f4b4a;
-      --on-act: #ffffff;
+      --stamp: #1B2A5A;
+      --on-stamp: #ffffff;
       --hazard: #7a1410;
       --wait: #5c3d09;
       color-scheme: light;

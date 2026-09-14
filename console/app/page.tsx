@@ -5,6 +5,7 @@ import { Case } from "@/lib/types";
 import {
   deliveryLines,
   plural,
+  primaryLot,
   productLine,
   stamp,
   unreachedCount,
@@ -35,132 +36,68 @@ export const metadata: Metadata = {
     "Open recalls that touch this pantry's shelves, in the order they have to be handled.",
 };
 
-/** A fact inside a sentence. The serif concludes, the mono proves. */
-function Fig({ children }: { children: React.ReactNode }) {
-  return <span className="fig">{children}</span>;
-}
-
-function Figure({
-  label,
-  value,
-  note,
-  hazardNote,
-}: {
-  label: string;
-  value: number;
-  note: string;
-  hazardNote?: string | null;
-}) {
-  return (
-    <div className="figure">
-      <dt>{label}</dt>
-      <dd>
-        <span className="figure-n">{value}</span>
-        <span className="figure-note">{note}</span>
-        {hazardNote ? (
-          <span className="figure-note hz">{hazardNote}</span>
-        ) : null}
-      </dd>
-    </div>
-  );
-}
-
 function Overview({ p }: { p: Position }) {
-  const clauses: React.ReactNode[] = [];
-  if (p.pullUnits > 0) {
-    clauses.push(
-      <>
-        <Fig>{p.pullUnits}</Fig> units come off the shelf in{" "}
-        <Fig>{p.pullBays.length}</Fig> {p.pullBays.length === 1 ? "bay" : "bays"}
-      </>,
-    );
-  }
-  if (p.checkLots.length > 0) {
-    clauses.push(
-      <>
-        <Fig>{p.checkLots.length}</Fig>{" "}
-        {p.checkLots.length === 1 ? "lot has" : "lots have"} to be read by hand
-      </>,
-    );
-  }
-  if (p.owed.length > 0) {
-    clauses.push(
-      <>
-        <Fig>{p.owed.length}</Fig>{" "}
-        {p.owed.length === 1 ? "household has" : "households have"} not been
-        told
-      </>,
-    );
-  }
+  const bayWord = p.pullBays.length === 1 ? "bay" : "bays";
+  const brief =
+    p.openCases === 0
+      ? "Nothing under recall on these shelves."
+      : `${p.openCases} open ${
+          p.openCases === 1 ? "recall touches" : "recalls touch"
+        } these shelves. Pull first. Then call the kitchens that already took some home.`;
 
   return (
     <section className="position">
-      <div className="label">
-        The position at {stamp(p.updatedAt)}
+      <div className="label">Shift brief · {stamp(p.updatedAt)}</div>
+
+      <p className="position-statement">{brief}</p>
+
+      <div className="sheets">
+        <section className="sheet-panel">
+          <div className="lbl">Shelf · pull sheet</div>
+          <div className="count">{p.pullUnits}</div>
+          <div className="verb">
+            units off {p.pullBays.length} {bayWord}
+          </div>
+          <div className="meta">
+            {plural(p.pullCases, "case", "cases")} ·{" "}
+            {plural(p.pullLots.length, "intake lot", "intake lots")}
+            {p.checkLots.length > 0 ? (
+              <>
+                <br />
+                {plural(p.checkLots.length, "lot", "lots")} still need a hand
+                read
+              </>
+            ) : null}
+          </div>
+          <Link className="cta" href="/pull">
+            Print pull sheet
+          </Link>
+        </section>
+
+        <section className="sheet-panel kitchens">
+          <div className="lbl">Kitchens · call sheet</div>
+          <div className="count">{p.owed.length}</div>
+          <div className="verb">
+            {p.owed.length === 1
+              ? "household not yet told"
+              : "households not yet told"}
+          </div>
+          <div className="meta">
+            {plural(p.owedUnits, "unit", "units")} already given out
+            {p.owedChildren > 0 ? (
+              <>
+                <br />
+                <span className="hot">
+                  {p.owedChildren} with a child under 5
+                </span>
+              </>
+            ) : null}
+          </div>
+          <Link className="cta" href="#matched-recalls">
+            Open call list
+          </Link>
+        </section>
       </div>
-
-      <p className="position-statement">
-        <Fig>{p.openCases}</Fig> open{" "}
-        {p.openCases === 1 ? "recall touches" : "recalls touch"} these shelves.
-        {clauses.length > 0 ? " " : null}
-        {clauses.map((c, i) => (
-          <span key={i}>
-            {i === 0 ? null : i === clauses.length - 1 ? ", and " : ", "}
-            {c}
-          </span>
-        ))}
-        {clauses.length > 0 ? "." : null}
-      </p>
-
-      <dl className="figures">
-        <Figure
-          label="Open recalls"
-          value={p.openCases}
-          note={
-            p.classI > 0
-              ? `${p.classI} Class I`
-              : "none classified Class I"
-          }
-          hazardNote={p.classI > 0 ? "reasonable chance of serious harm" : null}
-        />
-        <Figure
-          label="Units to pull"
-          value={p.pullUnits}
-          note={`${plural(p.pullCases, "case", "cases")} across ${plural(
-            p.pullLots.length,
-            "intake lot",
-            "intake lots",
-          )}`}
-        />
-        <Figure
-          label="Read by hand"
-          value={p.checkLots.length}
-          note={
-            p.checkBays.length > 0
-              ? p.checkBays.join(", ")
-              : "nothing waiting on a person"
-          }
-        />
-        <Figure
-          label="Households to call"
-          value={p.owed.length}
-          note={`${plural(p.owedUnits, "unit", "units")} already in kitchens`}
-          hazardNote={
-            p.owedChildren > 0
-              ? `${p.owedChildren} with a child under 5`
-              : null
-          }
-        />
-        <Figure
-          label="Households reached"
-          value={p.reached.length}
-          note={
-            p.reached.length > 0
-              ? "notice landed at the household's own address"
-              : "no notice has gone out yet"
-          }
-        />
-      </dl>
 
       {p.unreached.length > 0 ? (
         <div className="band band-short position-band">
@@ -185,9 +122,6 @@ function Overview({ p }: { p: Position }) {
       ) : null}
 
       <div className="position-acts">
-        <Link className="btn" href="/pull">
-          Print the pull sheet
-        </Link>
         <Link className="act-link" href="/passes">
           What the agent did overnight
         </Link>
@@ -399,9 +333,19 @@ function Rail({ group }: { group: Grouped }) {
   );
 }
 
+function LotStamp({ c }: { c: Case }) {
+  const lot = primaryLot(c);
+  const code = lot?.lot_code?.trim() || null;
+  if (code) {
+    return <div className="lot-stamp">{code}</div>;
+  }
+  return <div className="lot-stamp look">GO LOOK</div>;
+}
+
 function RecordBody({ c }: { c: Case }) {
   return (
     <>
+      <LotStamp c={c} />
       <h2 className="record-head">{c.headline}</h2>
       {products(c).map((p) => (
         <p className="record-product" key={p}>
@@ -422,7 +366,7 @@ function Record({ group }: { group: Grouped }) {
       <Link href={`/case/${lead.case_id}`} className="record">
         <div>
           <RecordBody c={lead} />
-          <span className="record-open">Open the case</span>
+          <span className="record-open">Open case</span>
         </div>
         <Rail group={group} />
       </Link>
@@ -491,8 +435,9 @@ function WinState({ closed }: { closed: Case[] }) {
   return (
     <div className="win">
       <p className="win-statement">
-        Nothing on the shelves is under recall right now.
+        Nothing under recall on these shelves.
       </p>
+      <div className="cleared-stamp">Cleared</div>
       {closed.length > 0 ? (
         <dl className="win-report">
           <div className="win-row">
@@ -583,10 +528,10 @@ export default async function QueuePage({
         <>
           <Overview p={position} />
 
-          <div className="block-head queue-head">
-            <h1 className="block-title">The queue</h1>
+          <div className="block-head queue-head" id="matched-recalls">
+            <h1 className="block-title">Matched recalls</h1>
             <span className="block-note">
-              one card per recall, in the order they have to be handled
+              stamp first · one card per recall, in the order they have to be handled
             </span>
           </div>
 

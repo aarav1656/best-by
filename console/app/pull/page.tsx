@@ -258,7 +258,7 @@ export default async function PullSheet({
 
       {/* Nothing to pull is nothing to sign for. */}
       {units > 0 ? (
-      <section className="signoff">
+      <section className="signoff signoff-stamp">
         <div className="label">When the cart comes back</div>
         <div className="signoff-grid">
           <div className="signoff-field">

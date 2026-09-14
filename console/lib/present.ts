@@ -67,9 +67,9 @@ export function stampExact(iso: string | null): string {
  */
 export const DELIVERY_STATE: Record<
   DeliveryMode | "missing",
-  { mark: string; tone: "act" | "wait" | "hazard" }
+  { mark: string; tone: "stamp" | "wait" | "hazard" }
 > = {
-  direct: { mark: "reached", tone: "act" },
+  direct: { mark: "reached", tone: "stamp" },
   simulator: { mark: "not reached", tone: "wait" },
   failed: { mark: "send failed", tone: "hazard" },
   missing: { mark: "no record", tone: "hazard" },

@@ -15,10 +15,13 @@ export function Masthead({
   pantryLocation: string | null;
   current?: string;
 }) {
+  const pantry = pantryName ?? "Pantry";
   return (
     <header className="masthead">
       <div className="masthead-left">
-        <div className="masthead-name">Best By</div>
+        <div className="masthead-name">
+          Best By <span className="masthead-pantry-inline">· {pantry}</span>
+        </div>
         <nav className="masthead-nav">
           {ROUTES.map((r) => (
             <Link
@@ -33,10 +36,9 @@ export function Masthead({
         </nav>
       </div>
       <div className="masthead-pantry">
-        {pantryName ?? "Pantry"}
-        {pantryLocation ? `, ${pantryLocation}` : ""}
-        <br />
-        FDA food enforcement feed against the intake log
+        {pantryLocation ? `${pantryLocation}` : ""}
+        {pantryLocation ? <br /> : null}
+        Lot codes on the case, matched to the FDA feed
       </div>
     </header>
   );
