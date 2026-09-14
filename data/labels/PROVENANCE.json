@@ -1,0 +1,59 @@
+{
+  "captured_at": "2026-09-14",
+  "images": [
+    {
+      "file": "genova-tuna-lotcode-bottom-F-0610-2025.jpg",
+      "recall_number": "F-0610-2025",
+      "product": "Genova Solid White / Yellowfin Tuna in Olive Oil, 5 oz can (Tri-Union Seafoods / Chicken of the Sea)",
+      "page_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/tri-union-seafoods-identifies-additional-quantities-recalled-genovar-tuna-limited-retailers-due",
+      "image_url": "https://www.fda.gov/files/styles/recall_image_small/public/image_6_33.jpg?itok=VpuNKU5N",
+      "pixels": [1020, 1017],
+      "shows": "bottom of can, lot/date panel fully legible: 'S88N  BEST IF USED BY 1/17/28 D1M'. This is the exact style of code panel the F-0610-2025 recall lists (lot S88ND1M, best by 01/17/2028). No UPC barcode, no brand text in frame. Photo published on the January 2026 FDA announcement for the follow-on release of quarantined stock from the same February 2025 easy-open-lid recall event; it is the same firm, brand and code format, not a separate photo attached to the F-0610-2025 record itself."
+    },
+    {
+      "file": "genova-tuna-4pack-front-F-0610-2025.jpg",
+      "recall_number": "F-0610-2025",
+      "product": "Genova Yellowfin Tuna in Olive Oil, 4-pack of 5 oz cans (Tri-Union Seafoods)",
+      "page_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/tri-union-seafoods-identifies-additional-quantities-recalled-genovar-tuna-limited-retailers-due",
+      "image_url": "https://www.fda.gov/files/styles/recall_image_small/public/image_1_221.jpg?itok=DrEeVQvT",
+      "pixels": [1020, 510],
+      "shows": "front-of-pack shrink-wrap label; 'EASY OPEN', 'YELLOWFIN TUNA', 'GENOVA', net weight 4-5 OZ (142g) legible. No lot code, no best-by date, no UPC barcode visible."
+    },
+    {
+      "file": "genova-tuna-can-lid-F-0610-2025.jpg",
+      "recall_number": "F-0610-2025",
+      "product": "Genova Yellowfin Tuna in Extra Virgin Olive Oil, single 5 oz can (Tri-Union Seafoods)",
+      "page_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/tri-union-seafoods-identifies-additional-quantities-recalled-genovar-tuna-limited-retailers-due",
+      "image_url": "https://www.fda.gov/files/styles/recall_image_small/public/image_4_69.jpg?itok=koBz3s6O",
+      "pixels": [1020, 626],
+      "shows": "single can, three-quarter view showing the easy-open pull-tab lid and the wrap label. Brand and product name legible; right edge of the nutrition/UPC panel is in frame but too foreshortened to read. No lot code or best-by date visible."
+    },
+    {
+      "file": "good-and-gather-street-corn-trail-mix-H-0835-2026.jpg",
+      "recall_number": "H-0835-2026",
+      "product": "Good & Gather Mexican Street Corn Inspired Trail Mix, 8 oz bag, UPC 085239270240 (John B Sanfilippo & Sons)",
+      "page_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/john-b-sanfilippo-son-inc-voluntarily-recalls-snack-mix-products-due-possible-health-risk",
+      "image_url": "https://www.fda.gov/files/image_2_196.jpg",
+      "pixels": [1600, 1600],
+      "shows": "front-of-pack only; brand, flavour, ingredient callouts and 'NET WT 8 OZ (226g)' legible. Lot code, the 'BEST BY 23/MAR/2027 GY' date and the UPC barcode are all on the back of the pouch and are NOT visible."
+    },
+    {
+      "file": "prospector-fudge-brownie-H-1234-2026.png",
+      "recall_number": "H-1234-2026",
+      "product": "Prospector Popcorn Fudge Brownie Gourmet Popcorn, 3.5 oz bag, UPC 850073852293 (Prospector Popcorn, LLC)",
+      "page_url": "https://prospectorpopcorn.org/products/fudge-brownie-pack",
+      "image_url": "https://prospectorpopcorn.org/cdn/shop/files/FudgeBrownie3PackWithShadow.png?v=1774716883",
+      "pixels": [1500, 1000],
+      "shows": "front-of-pack of three stand-up pouches; brand, 'FUDGE BROWNIE', flavour callouts and 'Net wt 3.5 oz (99 g)' legible. Lot code, best-by date and UPC barcode are not visible. Retailer/firm marketing photo, not an FDA photo; FDA published no press announcement for this Class III recall."
+    },
+    {
+      "file": "tom-bumble-nutty-box-H-0391-2026.jpg",
+      "recall_number": "H-0391-2026",
+      "product": "Tom Bumble Nutty Peanut Butter Flake Candy with Peanuts & Chocolate, 1.2 oz bar, 2-bar box, UPC 852905007024 (Tom Bumble LLC / Oregon Bark)",
+      "page_url": "https://www.oregonbark.com/shop/tom-bumble-peanut-butter-flake-candy-with-chocolate/",
+      "image_url": "https://www.oregonbark.com/wp-content/uploads/2025/12/Tom-Bumble-2Bars-Box-5050-Open.jpg",
+      "pixels": [5036, 4098],
+      "shows": "2-bar kraft carton plus both bar wrappers. Fully legible: 'TOMBUMBLE NUTTY / PEANUT BUTTER FLAKE CANDY WITH PEANUTS & CHOCOLATE / GF V / NET WEIGHT 1.2 OZ / 34 GR / OREGON BARK / 2630 NE SANDY, PORTLAND, OR 97232', plus the carton's ingredient statement and 'CONTAINS PEANUTS'. Lot code, best-by date and UPC barcode are NOT visible. Firm marketing photo; FDA published no press announcement for this recall."
+    }
+  ]
+}

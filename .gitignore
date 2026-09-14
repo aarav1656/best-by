@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+.next/
+.env
+.env.local
+build/
+build.zip
+*.zip
+console/node_modules/
+console/.next/
+console/.vercel/
+console/.env*.local
+data/cases/
+docs/*.visual-check.*
