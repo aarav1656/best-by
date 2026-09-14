@@ -491,10 +491,23 @@ accepted it) and a `mode` of `direct`, `simulator` or `failed`. A coordinator
 reading a case in six months has to be able to tell a notice that reached a
 family from one that reached a mailbox simulator.
 
-**Not built:** FSIS, which publishes meat and poultry recalls, is the obvious
-second feed and would need no engine changes, since `agent/feeds/base.py` is
-already the seam. Its API is blocked by a WAF from the network this was built on,
-so it is not wired up rather than half wired up.
+**Not built, stated plainly:**
+
+- **The console is read-only.** The approval path works and is proven above, but
+  the coordinator hands a case id to the next run rather than clicking a button:
+  `--approve <case_id>` locally, or `{"approve": ["<case_id>"]}` in the Lambda
+  payload. Wiring a button to that would be a write endpoint and an auth story,
+  and neither exists yet, so the console does not pretend to have one.
+- **FSIS**, which publishes meat and poultry recalls, is the obvious second feed
+  and would need no engine changes, since `agent/feeds/base.py` is already the
+  seam. Its API is blocked by a WAF from the network this was built on, so it is
+  not wired up rather than half wired up.
+- **One pantry.** `load_pantry` takes a path and the Lambda reads one file. The
+  multi-tenant version is a loop and a partition key, both of which already
+  exist, but it has not been run with two pantries so it is not claimed.
+- **The intake app does not exist.** `scripts/read_intake_photo.py` runs the
+  read end to end from a shell, and it is the code a phone would call, but the
+  volunteer-facing capture screen is not built.
 
 ---
 
