@@ -4,6 +4,7 @@ An agent that watches the FDA food recall feed against what a food pantry
 actually has on its shelves, and who already took some home.
 
 Live console: **https://best-by.vercel.app**
+Architecture: [`docs/architecture.html`](docs/architecture.html)
 Repository: **https://github.com/kamalbuilds/best-by**
 
 ---
@@ -284,6 +285,58 @@ The pull happened. The disposal record was filed. Five families have not been
 emailed, because no human has looked at it yet, and the pass moved on rather than
 hanging. Approvals come back through the console and are handed to the next
 invocation.
+
+### And the gate opening
+
+A check that can only refuse is a wall. Hand the next run the case the
+coordinator approved, in production:
+
+```
+$ aws lambda invoke --function-name bestby-run \
+    --payload '{"agent":true,"approve":["73a4bb419a7da04b"]}' \
+    --cli-binary-format raw-in-base64-out /dev/stdout
+
+{"event": "approved", "detail": "73a4bb419a7da04b was approved by the coordinator"}
+{"event": "notified", "detail": "73a4bb419a7da04b: 10 direct, 0 simulator"}
+{"event": "record_filed", "detail": "73a4bb419a7da04b -> s3://.../F-0617-2025.txt"}
+{"event": "awaiting_approval", "detail": "e5714a2475a62728 is drafted and waiting for a person"}
+```
+
+Ten real SES sends for the approved case, and the three cases nobody approved
+still held. The compliance record for that case now reads:
+
+```
+  Household     Units  Last given   Under 5  Notified
+  H-0166           10  2026-07-29         3  direct 010001a09feab49a-89ee8d4
+  H-0214            9  2026-08-12         2  direct 010001a09feab55c-89313a7
+  H-0104            6  2026-07-22         2  direct 010001a09feab639-330dd11
+  H-0195            6  2026-08-05         2  direct 010001a09feab70d-62b20f8
+  H-0143            8  2026-07-29         1  direct 010001a09feab7d0-775779e
+  H-0248            6  2026-08-12         1  direct 010001a09feab89f-d2d6cff
+  H-0171            5  2026-08-05         1  direct 010001a09feab96c-973a2dc
+  H-0117            4  2026-07-22         1  direct 010001a09feaba3d-488f699
+  H-0129            5  2026-08-26         0  direct 010001a09feabb2b-efc66ca
+  H-0227            4  2026-08-19         0  direct 010001a09feabc2c-a593a8c
+```
+
+Every line carries the SES message id that proves it, and the households with a
+child under five are listed first because botulism notices name under-fives as
+the population at risk.
+
+This is the notice the agent wrote and the coordinator approved, verbatim:
+
+> We gave {household} {units} of Genova Yellowfin Tuna in Extra Virgin Olive Oil
+> and Sea Salt (5 oz can) on July 18, 2026. This product is recalled because the
+> lid may not seal properly, which can allow botulism contamination (recall
+> F-0617-2025).
+>
+> Botulism is a serious illness that can cause paralysis and death.
+>
+> Do not eat this tuna. Do not open or taste it. Throw it away in a sealed bag or
+> return it to the pantry for replacement.
+>
+> If anyone has eaten this product and feels sick, weak, or has trouble
+> swallowing or breathing, call 911 immediately.
 
 ---
 
