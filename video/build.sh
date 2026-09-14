@@ -14,21 +14,20 @@ H=1080
 # beat | visual sources, comma separated, split evenly across the beat
 MANIFEST="
 01_consignee|sources/01_consignee.png
-02_freezer|sources/02_freezer.png
-04_study|sources/04_study.png
-05_measure|casts/01_feed.cast
-06_absence|../docs/frames/reveal-1.png
-07_extract|../docs/frames/reveal-2.png
+02_codeinfo|casts/01_feed.cast
+03_intake|../data/labels/genova-tuna-lotcode-bottom-F-0610-2025.jpg,casts/03_intake.cast
+04_match|casts/04_match.cast
+05_freezer|sources/02_freezer.png
+06_study|sources/04_study.png
+07_absence|../docs/frames/reveal-1.png
 08_engine|../docs/frames/reveal-3.png
-09_intake|../data/labels/genova-tuna-lotcode-bottom-F-0610-2025.jpg,casts/03_intake.cast
-10_match|casts/04_match.cast
-11_split|casts/05_split.cast
-12_gate|../docs/frames/reveal-4.png,casts/06_gate.cast
-13_sends|casts/07_sends.cast
-14_veto|casts/08_veto.cast
-15_unattended|casts/09_unattended.cast
-16_pullsheet|../console/shots/pull-print-page1.png
-17_close|cards/10_close.png
+09_split|casts/05_split.cast
+10_gate|../docs/frames/reveal-4.png,casts/06_gate.cast
+11_pullsheet|../console/shots/pull-live-1440.png
+12_sends|casts/07_sends.cast
+13_veto|casts/08_veto.cast
+14_unattended|casts/09_unattended.cast
+15_close|cards/10_close.png
 "
 
 render_cast() {
