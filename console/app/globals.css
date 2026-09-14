@@ -18,7 +18,9 @@
     --t-statement: clamp(28px, 2vw + 16px, 38px);
     --t-record: clamp(18px, 0.6vw + 15px, 22px);
     --t-hazard: clamp(16px, 0.4vw + 14.5px, 17px);
-    --t-stamp: clamp(22px, 2vw + 12px, 36px);
+    /* The lot code is the product's whole claim, so it is the largest ink on a
+       card, not a caption on one. */
+    --t-stamp: clamp(30px, 3.2vw + 12px, 54px);
     --t-count: 28px;
 
     --serif: ui-serif, Georgia, serif;
@@ -62,6 +64,19 @@
 
   body {
     background: var(--paper);
+    /* Carton fibre. Two crossing hairline weaves at 2%, so the kraft reads as
+       board stock rather than as a flat beige fill. */
+    background-image:
+      repeating-linear-gradient(
+        22deg,
+        color-mix(in srgb, var(--ink) 3%, transparent) 0 1px,
+        transparent 1px 7px
+      ),
+      repeating-linear-gradient(
+        -67deg,
+        color-mix(in srgb, var(--ink) 2%, transparent) 0 1px,
+        transparent 1px 11px
+      );
     color: var(--ink);
     font-family: var(--serif);
     font-size: 16px;
@@ -512,6 +527,38 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+  }
+
+  .filter-more {
+    margin: 2px 0 4px;
+  }
+
+  .filter-more-summary {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    cursor: pointer;
+    padding: 6px 0;
+    list-style: none;
+  }
+
+  .filter-more-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .filter-more-summary::before {
+    content: "+ ";
+    color: var(--stamp);
+  }
+
+  .filter-more[open] .filter-more-summary::before {
+    content: "− ";
+  }
+
+  .filter-more-summary:hover {
+    color: var(--ink);
   }
 
   .chip {

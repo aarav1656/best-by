@@ -35,11 +35,7 @@ export function Masthead({
           ))}
         </nav>
       </div>
-      <div className="masthead-pantry">
-        {pantryLocation ? `${pantryLocation}` : ""}
-        {pantryLocation ? <br /> : null}
-        Lot codes on the case, matched to the FDA feed
-      </div>
+      <div className="masthead-pantry">{pantryLocation ?? ""}</div>
     </header>
   );
 }

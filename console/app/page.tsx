@@ -46,43 +46,46 @@ export const metadata: Metadata = {
  * coordinator needs at 8am is who they are, whether the data is current, how much is
  * on them, and what it costs to do nothing.
  */
+/**
+ * The lead. Two imperative sentences a coordinator can act on before they read
+ * anything else: what comes off the shelf, and who has to be phoned. It used to
+ * open on a count of recalls, which is the agent's unit of work rather than the
+ * shift's, and on a row of mono status labels nobody can do anything with.
+ */
 function OperatorStrip({ p, pantry }: { p: Position; pantry: string }) {
-  const cost =
+  const pull =
+    p.pullUnits > 0
+      ? `Pull ${plural(p.pullUnits, "unit", "units")} off ${plural(p.pullBays.length, "bay", "bays")}.`
+      : "Nothing to pull off the shelves.";
+
+  const call =
     p.owed.length > 0
-      ? `${p.owed.length} ${p.owed.length === 1 ? "household has" : "households have"} recalled units at home`
-      : p.pullUnits > 0
-        ? `${p.pullUnits} units still on the shelf`
-        : "nothing outstanding";
+      ? `Call ${plural(p.owed.length, "household", "households")} who already took some home.`
+      : "No household is owed a call.";
+
+  const hand =
+    p.checkLots.length > 0
+      ? `${plural(p.checkLots.length, "lot", "lots")} still need a code read by hand.`
+      : null;
 
   return (
     <section className="strip">
-      <div className="strip-row">
-        <span className="strip-role">Pantry lead</span>
-        <span className="strip-sep" aria-hidden="true">
-          ·
-        </span>
-        <span className="strip-where">{pantry}</span>
-        <span className="strip-live">
-          <span className="strip-dot" aria-hidden="true" />
-          LIVE · synced {stamp(p.updatedAt)}
-        </span>
-      </div>
-
       <p className="strip-contract">
-        {p.openCases === 0
-          ? "Nothing under recall on these shelves."
-          : `${p.openCases} ${p.openCases === 1 ? "recall needs" : "recalls need"} a decision.`}
+        {pull} {call}
       </p>
 
-      <p className="strip-cost">{cost}</p>
+      {p.owedChildren > 0 ? (
+        <p className="strip-cost">
+          {p.owedChildren} of those {p.owedChildren === 1 ? "household has" : "households have"} a
+          child under five.
+        </p>
+      ) : hand ? (
+        <p className="strip-cost">{hand}</p>
+      ) : null}
 
       <p className="strip-machine micro">
-        The overnight pass did the reading. {plural(p.pullUnits, "unit", "units")} to pull
-        across {plural(p.pullBays.length, "bay", "bays")}
-        {p.checkLots.length > 0
-          ? `, ${plural(p.checkLots.length, "lot", "lots")} to read by hand`
-          : ""}
-        .
+        {pantry} · read {stamp(p.updatedAt)}
+        {p.owedChildren > 0 && hand ? ` · ${hand}` : ""}
       </p>
     </section>
   );
@@ -205,6 +208,12 @@ function Filters({
         </div>
       </div>
 
+      {/* Bay and household are the second question, asked once a coordinator has
+          already narrowed by hazard. Four stacked label rows put four questions
+          on screen at once and read as a settings panel. */}
+      <details className="filter-more" open={q.bay !== null || q.households !== null}>
+        <summary className="filter-more-summary">Narrow by bay or household</summary>
+
       <div className="filter-row">
         <span className="label">Bay</span>
         <div className="chips">
@@ -248,6 +257,7 @@ function Filters({
           </Link>
         </div>
       </div>
+      </details>
 
       <div className="filter-row">
         <span className="label">Order</span>
@@ -361,7 +371,6 @@ function Rail({ group }: { group: Grouped }) {
           {k}
         </div>
       ))}
-      <div className="micro">{lead.recall.firm_location}</div>
     </div>
   );
 }
@@ -568,7 +577,7 @@ export default async function QueuePage({
           <div className="block-head queue-head" id="matched-recalls">
             <h1 className="block-title">Matched recalls</h1>
             <span className="block-note">
-              stamp first · one card per recall, in the order they have to be handled
+              One card per recall, in the order they have to be handled
             </span>
           </div>
 

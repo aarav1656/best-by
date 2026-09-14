@@ -1,13 +1,13 @@
 {
-  "as": "shift console for a pantry recall coordinator: overview, printable pull sheet, pass history",
-  "dials": "8/5/3",
+  "as": "pantry recall queue for a coordinator twenty minutes before a volunteer shift, stamp and sheet",
+  "dials": "5/2/6",
   "type": "Literata + JetBrains Mono",
-  "surface": "cool pale paper",
-  "accent": "deep teal act, oxblood hazard",
-  "radius": "2",
+  "surface": "warm carton kraft",
+  "accent": "indigo stamp ink",
+  "radius": "1",
   "showpiece": "none",
   "direction": "design-taste-frontend",
   "review": "anti-ai-slop-frontend",
   "cwd": "/Users/kamal/Desktop/best-by/console",
-  "ts": "2026-09-14T13:12:38Z"
+  "ts": "2026-09-14T20:25:08Z"
 }
