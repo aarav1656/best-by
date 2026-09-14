@@ -187,7 +187,7 @@
     text-align: right;
   }
 
-  /* the position: what a coordinator needs before they read a single card -- */
+  /* the position, read before a single card ----------------------------- */
 
   .position {
     padding: 38px 0 0;
