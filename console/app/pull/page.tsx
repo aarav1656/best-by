@@ -132,6 +132,28 @@ export default async function PullSheet({
   const caseCount = bays.reduce((n, b) => n + b.cases, 0);
   const lookCount = lookBays.reduce((n, b) => n + b.lots.length, 0);
 
+  // A zero is a thing to read and an absence is not, so a sheet with nothing to
+  // read by hand says nothing about reading by hand.
+  const take =
+    bays.length === 0
+      ? null
+      : `Take ${units} units off ${
+          bays.length === 1 ? "one bay" : `${bays.length} bays`
+        }`;
+  const look =
+    lookCount === 0
+      ? null
+      : `read ${plural(lookCount, "lot", "lots")} by hand`;
+  const statement = take
+    ? look
+      ? `${take}, and ${look}.`
+      : `${take}.`
+    : look
+      ? `${look[0].toUpperCase()}${look.slice(1)}.`
+      : bayFilter
+        ? `Nothing in ${bayFilter} is named by an open notice.`
+        : "There is nothing to take off the shelf.";
+
   return (
     <main className="shell">
       <Masthead
@@ -155,11 +177,7 @@ export default async function PullSheet({
         <div className="label">
           Pull sheet, read at {stamp(read.at)}
         </div>
-        <h1 className="sheet-statement">
-          {p.pullLots.length === 0 && p.checkLots.length === 0
-            ? "There is nothing to take off the shelf."
-            : `Take ${units} units off ${bays.length === 1 ? "one bay" : `${bays.length} bays`}, and read ${lookCount} ${lookCount === 1 ? "lot" : "lots"} by hand.`}
-        </h1>
+        <h1 className="sheet-statement">{statement}</h1>
         <p className="sheet-sub">
           Every row is one intake lot that a live FDA notice names. Tick it when
           the cases are off the shelf and in the destroy bin. A lot appears once
@@ -215,9 +233,11 @@ export default async function PullSheet({
 
       {bays.length === 0 ? (
         <p className="queue-none">
-          Nothing on{" "}
-          {bayFilter ? bayFilter : "these shelves"} is named by an open notice.
-          The lots below still have to be read by hand.
+          Nothing on {bayFilter ?? "these shelves"} is named by an open notice
+          with a code this pantry can check.
+          {lookCount > 0
+            ? " The lots below still have to be read by hand."
+            : " Every lot here was compared against a recalled code and stays where it is."}
         </p>
       ) : null}
 
@@ -236,6 +256,8 @@ export default async function PullSheet({
         </section>
       ))}
 
+      {/* Nothing to pull is nothing to sign for. */}
+      {units > 0 ? (
       <section className="signoff">
         <div className="label">When the cart comes back</div>
         <div className="signoff-grid">
@@ -257,6 +279,7 @@ export default async function PullSheet({
           as short, never as done.
         </p>
       </section>
+      ) : null}
 
       <Provenance read={read} rows={cases.length} />
     </main>
