@@ -85,6 +85,12 @@ def _from_dynamo(value: Any) -> Any:
 TIMELINE_CAP = 200
 
 
+# Once a case reaches one of these, a later pass may add to its timeline but may
+# never put it back in front of a person as undecided. Everything else is a
+# working state that a fresh sweep is allowed to recompute.
+_TERMINAL_STATUSES = frozenset({"notified", "pulled"})
+
+
 def merge_timeline(previous: list[dict], current: list[dict]) -> list[dict]:
     """Union of two timelines, in order, deduplicated, bounded.
 
@@ -140,6 +146,14 @@ class CaseStore:
             for carried in ("delivery", "evidence_uri", "notice_text", "approved_by", "approved_at"):
                 if previous.get(carried) and not case.get(carried):
                     merged[carried] = previous[carried]
+            # A pass rebuilds every case from the feed. Without this, a case that
+            # already notified households comes back as awaiting_approval, re-enters
+            # the decision queue, and a coordinator approving it a second time sends
+            # every household a second notice. Contacting people again about food
+            # they already heard about is not cosmetic: it is what teaches a pantry
+            # to ignore the tool. Work done is not undone by a later look at the shelf.
+            if previous.get("status") in _TERMINAL_STATUSES:
+                merged["status"] = previous["status"]
         self.table.put_item(Item=_to_dynamo(merged))
         return merged
 
