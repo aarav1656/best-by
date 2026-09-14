@@ -5,7 +5,7 @@ actually has on its shelves, and who already took some home.
 
 Live console: **https://best-by.vercel.app**
 Architecture: [`docs/architecture.html`](docs/architecture.html)
-Repository: **https://github.com/kamalbuilds/best-by**
+Repository: **https://github.com/aarav1656/best-by**
 
 ---
 
@@ -575,7 +575,7 @@ REPORT RequestId: 89fa9eb0-4695-4e98-86ca-c16a731896fe  Duration: 8941.87 ms
 ## Running it
 
 ```bash
-git clone https://github.com/kamalbuilds/best-by && cd best-by
+git clone https://github.com/aarav1656/best-by && cd best-by
 python3.12 -m venv .venv && .venv/bin/pip install -e '.[dev]'
 
 # The tests need nothing. No key, no AWS.
