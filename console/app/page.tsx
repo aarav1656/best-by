@@ -26,6 +26,7 @@ import {
   parseQuery,
 } from "@/lib/filters";
 import { Masthead } from "./masthead";
+import { NotifyVerb, PullVerb } from "./verbs";
 import { Provenance } from "./provenance";
 
 export const dynamic = "force-dynamic";
@@ -36,27 +37,66 @@ export const metadata: Metadata = {
     "Open recalls that touch this pantry's shelves, in the order they have to be handled.",
 };
 
-function Overview({ p }: { p: Position }) {
-  const bayWord = p.pullBays.length === 1 ? "bay" : "bays";
-  const brief =
-    p.openCases === 0
-      ? "Nothing under recall on these shelves."
-      : `${p.openCases} open ${
-          p.openCases === 1 ? "recall touches" : "recalls touch"
-        } these shelves. Pull first. Then call the kitchens that already took some home.`;
+/**
+ * The operator strip. Five facts, one line each, above anything else.
+ *
+ * What was here before was a paragraph about what the last pass read, which is a
+ * sentence written by someone proud of the pipeline and not yet thinking about the
+ * person holding the clipboard. The pipeline detail lives in the README now. What a
+ * coordinator needs at 8am is who they are, whether the data is current, how much is
+ * on them, and what it costs to do nothing.
+ */
+function OperatorStrip({ p, pantry }: { p: Position; pantry: string }) {
+  const cost =
+    p.owed.length > 0
+      ? `${p.owed.length} ${p.owed.length === 1 ? "household has" : "households have"} recalled units at home`
+      : p.pullUnits > 0
+        ? `${p.pullUnits} units still on the shelf`
+        : "nothing outstanding";
 
   return (
+    <section className="strip">
+      <div className="strip-row">
+        <span className="strip-role">Pantry lead</span>
+        <span className="strip-sep" aria-hidden="true">
+          ·
+        </span>
+        <span className="strip-where">{pantry}</span>
+        <span className="strip-live">
+          <span className="strip-dot" aria-hidden="true" />
+          LIVE · synced {stamp(p.updatedAt)}
+        </span>
+      </div>
+
+      <p className="strip-contract">
+        {p.openCases === 0
+          ? "Nothing under recall on these shelves."
+          : `${p.openCases} ${p.openCases === 1 ? "recall needs" : "recalls need"} a decision.`}
+      </p>
+
+      <p className="strip-cost">{cost}</p>
+
+      <p className="strip-machine micro">
+        The overnight pass did the reading. {plural(p.pullUnits, "unit", "units")} to pull
+        across {plural(p.pullBays.length, "bay", "bays")}
+        {p.checkLots.length > 0
+          ? `, ${plural(p.checkLots.length, "lot", "lots")} to read by hand`
+          : ""}
+        .
+      </p>
+    </section>
+  );
+}
+
+function Overview({ p }: { p: Position }) {
+  return (
     <section className="position">
-      <div className="label">Shift brief · {stamp(p.updatedAt)}</div>
-
-      <p className="position-statement">{brief}</p>
-
       <div className="sheets">
         <section className="sheet-panel">
           <div className="lbl">Shelf · pull sheet</div>
           <div className="count">{p.pullUnits}</div>
           <div className="verb">
-            units off {p.pullBays.length} {bayWord}
+            units off {p.pullBays.length} {p.pullBays.length === 1 ? "bay" : "bays"}
           </div>
           <div className="meta">
             {plural(p.pullCases, "case", "cases")} ·{" "}
@@ -64,8 +104,7 @@ function Overview({ p }: { p: Position }) {
             {p.checkLots.length > 0 ? (
               <>
                 <br />
-                {plural(p.checkLots.length, "lot", "lots")} still need a hand
-                read
+                {plural(p.checkLots.length, "lot", "lots")} still need a hand read
               </>
             ) : null}
           </div>
@@ -78,18 +117,14 @@ function Overview({ p }: { p: Position }) {
           <div className="lbl">Kitchens · call sheet</div>
           <div className="count">{p.owed.length}</div>
           <div className="verb">
-            {p.owed.length === 1
-              ? "household not yet told"
-              : "households not yet told"}
+            {p.owed.length === 1 ? "household not yet told" : "households not yet told"}
           </div>
           <div className="meta">
             {plural(p.owedUnits, "unit", "units")} already given out
             {p.owedChildren > 0 ? (
               <>
                 <br />
-                <span className="hot">
-                  {p.owedChildren} with a child under 5
-                </span>
+                <span className="hot">{p.owedChildren} with a child under 5</span>
               </>
             ) : null}
           </div>
@@ -102,8 +137,8 @@ function Overview({ p }: { p: Position }) {
       {p.unreached.length > 0 ? (
         <div className="band band-short position-band">
           <p className="band-statement">
-            {plural(p.unreachedHouseholds, "household", "households")} were sent
-            a notice that did not reach them.
+            {plural(p.unreachedHouseholds, "household", "households")} were sent a notice that did
+            not reach them.
           </p>
           <p className="band-detail">
             Phone them. The list is on each case:{" "}
@@ -128,9 +163,8 @@ function Overview({ p }: { p: Position }) {
       </div>
 
       <p className="position-note micro">
-        Every figure is a count of rows in the cases table. A lot is counted
-        once by its intake id and a household once by its id, however many
-        notices name it.
+        Every figure is a count of rows in the cases table. A lot is counted once by its intake id
+        and a household once by its id, however many notices name it.
       </p>
     </section>
   );
@@ -247,40 +281,39 @@ function Obligations({ c }: { c: Case }) {
   const errandBays = [
     ...new Set(c.needs_evidence.map((l) => l.storage_location)),
   ];
+  const lot = primaryLot(c);
   return (
     <div className="obligations">
       {c.pull.units > 0 ? (
-        <div className="ob ob-pull">
-          <div className="label">Pull</div>
-          <div className="ob-count">
-            {c.pull.units}{" "}
-            <span>{c.pull.units === 1 ? "unit" : "units"}</span>
-          </div>
-          <div className="ob-where">
-            {plural(c.pull.cases, "case", "cases")} in{" "}
-            {c.pull.locations.join(", ")}
-          </div>
-        </div>
+        <PullVerb
+          caseId={c.case_id}
+          units={c.pull.units}
+          cases={c.pull.cases}
+          bay={c.pull.locations.join(", ")}
+          lot={lot?.lot_code ?? null}
+          done={
+            c.pull_record
+              ? {
+                  at: c.pull_record.at,
+                  by: c.pull_record.pulled_by,
+                  destroyed: c.pull_record.units_destroyed,
+                  expected: c.pull_record.units_expected,
+                  complete: c.pull_record.complete,
+                }
+              : null
+          }
+        />
       ) : null}
 
       {c.notify.households > 0 ? (
-        <div className="ob ob-notify">
-          <div className="label">Notify</div>
-          <div className="ob-count">
-            {c.notify.households}{" "}
-            <span>
-              {c.notify.households === 1 ? "household" : "households"}
-            </span>
-          </div>
-          <div className="ob-where">
-            {plural(c.notify.units, "unit", "units")} already given out
-            {c.notify.children_under_5 > 0 ? (
-              <span className="under5">
-                {c.notify.children_under_5} with a child under 5
-              </span>
-            ) : null}
-          </div>
-        </div>
+        <NotifyVerb
+          caseId={c.case_id}
+          households={c.notify.households}
+          units={c.notify.units}
+          children5={c.notify.children_under_5}
+          approvedAt={c.approved_at ?? null}
+          delivered={Boolean(c.delivery)}
+        />
       ) : null}
 
       {c.needs_evidence.length > 0 ? (
@@ -526,6 +559,10 @@ export default async function QueuePage({
         <WinState closed={closed} />
       ) : (
         <>
+          <OperatorStrip
+            p={position}
+            pantry={first?.pantry_name ?? "this pantry"}
+          />
           <Overview p={position} />
 
           <div className="block-head queue-head" id="matched-recalls">

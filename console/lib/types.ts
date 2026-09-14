@@ -132,6 +132,14 @@ export interface Case {
   timeline: TimelineEvent[];
   created_at: string;
   updated_at: string;
+  /**
+   * Set by the console when a coordinator approves the notice, and by nothing else.
+   * It is deliberately separate from `delivery`: approval means a person said send
+   * it, delivery means SES actually took it and handed back a message id. Collapsing
+   * the two would let this page claim a household was warned when nobody was.
+   */
+  approved_at?: string | null;
+  approved_by?: string | null;
 }
 
 export const URGENCY_ORDER: Record<Urgency, number> = {
