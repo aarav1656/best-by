@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Best By",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1280,
+      670
+    ],
+    "legend": {
+      "mode": "hidden"
+    }
+  },
+  "components": [
+    {
+      "id": "src",
+      "type": "external",
+      "label": "openFDA food enforcement",
+      "sublabel": "api.fda.gov, live",
+      "pos": [
+        40,
+        60
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "614 open reports"
+    },
+    {
+      "id": "person",
+      "type": "external",
+      "label": "The food pantry",
+      "sublabel": "the shelf, and who took food home",
+      "pos": [
+        1030,
+        60
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "hears nothing"
+    }
+  ],
+  "connections": [
+    {
+      "id": "silence",
+      "from": "src",
+      "to": "person",
+      "label": "no notice reaches the shelf",
+      "variant": "dashed"
+    }
+  ]
+}

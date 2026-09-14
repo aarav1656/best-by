@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Best By",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1280,
+      670
+    ],
+    "legend": {
+      "mode": "hidden"
+    }
+  },
+  "components": [
+    {
+      "id": "src",
+      "type": "external",
+      "label": "openFDA food enforcement",
+      "sublabel": "api.fda.gov, live",
+      "pos": [
+        40,
+        60
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "614 open reports"
+    },
+    {
+      "id": "extract",
+      "type": "backend",
+      "label": "Identifier extractor",
+      "sublabel": "code_info prose to checkable facts",
+      "pos": [
+        370,
+        60
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "27.0% name nothing checkable"
+    },
+    {
+      "id": "engine",
+      "type": "backend",
+      "label": "Verdict engine",
+      "sublabel": "MATCH, NEEDS_EVIDENCE, NO_MATCH",
+      "pos": [
+        700,
+        60
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "no prompt reaches it"
+    },
+    {
+      "id": "person",
+      "type": "external",
+      "label": "The food pantry",
+      "sublabel": "the shelf, and who took food home",
+      "pos": [
+        1030,
+        60
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "hears nothing"
+    },
+    {
+      "id": "ledger",
+      "type": "database",
+      "label": "DynamoDB bestby-cases",
+      "sublabel": "the case, and its verdict",
+      "pos": [
+        40,
+        290
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "PK pantry_id, SK case_id"
+    },
+    {
+      "id": "model",
+      "type": "backend",
+      "label": "Strands agent",
+      "sublabel": "reads identity, drafts the notice",
+      "pos": [
+        700,
+        290
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "decides nothing"
+    },
+    {
+      "id": "gate",
+      "type": "security",
+      "label": "Approval gate",
+      "sublabel": "Strands HumanInTheLoop",
+      "pos": [
+        1030,
+        290
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "allowed_tools: !notify_households"
+    },
+    {
+      "id": "evidence",
+      "type": "cloud",
+      "label": "S3 evidence",
+      "sublabel": "a disposal record per lot",
+      "pos": [
+        370,
+        520
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "what an inspector asks for"
+    },
+    {
+      "id": "veto",
+      "type": "security",
+      "label": "NotifyVeto hook",
+      "sublabel": "BeforeToolCallEvent",
+      "pos": [
+        700,
+        520
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "cancels notify_households"
+    },
+    {
+      "id": "terminus",
+      "type": "cloud",
+      "label": "Amazon SES",
+      "sublabel": "one notice per household",
+      "pos": [
+        1030,
+        520
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "irreversible"
+    }
+  ],
+  "connections": [
+    {
+      "id": "fetch",
+      "from": "src",
+      "to": "extract",
+      "label": "reports, as prose",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "constraints",
+      "from": "extract",
+      "to": "engine",
+      "label": "checkable codes",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "owned",
+      "from": "person",
+      "to": "engine",
+      "label": "read at intake",
+      "fromSide": "left",
+      "toSide": "right"
+    },
+    {
+      "id": "identity",
+      "from": "model",
+      "to": "engine",
+      "label": "product identity, nothing else",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "variant": "emphasis"
+    },
+    {
+      "id": "attempt",
+      "from": "model",
+      "to": "veto",
+      "label": "notify_households",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 87
+    },
+    {
+      "id": "ruling",
+      "from": "veto",
+      "to": "gate",
+      "label": "only with a MATCH on file",
+      "fromSide": "right",
+      "toSide": "left",
+      "variant": "security"
+    },
+    {
+      "id": "approval",
+      "from": "person",
+      "to": "gate",
+      "label": "one decision per recall",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 87
+    },
+    {
+      "id": "filed",
+      "from": "gate",
+      "to": "terminus",
+      "label": "notice sent",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 87,
+      "variant": "emphasis"
+    },
+    {
+      "id": "cases",
+      "from": "model",
+      "to": "ledger",
+      "label": "one case per recall",
+      "fromSide": "left",
+      "toSide": "right"
+    },
+    {
+      "id": "pack",
+      "from": "model",
+      "to": "evidence",
+      "label": "disposal record",
+      "fromSide": "bottom",
+      "toSide": "right",
+      "variant": "dashed"
+    }
+  ]
+}

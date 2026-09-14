@@ -54,7 +54,8 @@
         ],
         "note": "The model reads product identity. The verdict engine decides. The hook cancels any notification that is not a confirmed match."
       }
-    ]
+    ],
+    "animation": "trace"
   },
   "components": [
     {

@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Best By",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1280,
+      670
+    ],
+    "legend": {
+      "mode": "hidden"
+    }
+  },
+  "components": [
+    {
+      "id": "src",
+      "type": "external",
+      "label": "openFDA food enforcement",
+      "sublabel": "api.fda.gov, live",
+      "pos": [
+        40,
+        60
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "614 open reports"
+    },
+    {
+      "id": "extract",
+      "type": "backend",
+      "label": "Identifier extractor",
+      "sublabel": "code_info prose to checkable facts",
+      "pos": [
+        370,
+        60
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "27.0% name nothing checkable"
+    },
+    {
+      "id": "engine",
+      "type": "backend",
+      "label": "Verdict engine",
+      "sublabel": "MATCH, NEEDS_EVIDENCE, NO_MATCH",
+      "pos": [
+        700,
+        60
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "no prompt reaches it"
+    },
+    {
+      "id": "person",
+      "type": "external",
+      "label": "The food pantry",
+      "sublabel": "the shelf, and who took food home",
+      "pos": [
+        1030,
+        60
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "hears nothing"
+    },
+    {
+      "id": "model",
+      "type": "backend",
+      "label": "Strands agent",
+      "sublabel": "reads identity, drafts the notice",
+      "pos": [
+        700,
+        290
+      ],
+      "size": [
+        200,
+        96
+      ],
+      "tag": "decides nothing"
+    }
+  ],
+  "connections": [
+    {
+      "id": "fetch",
+      "from": "src",
+      "to": "extract",
+      "label": "reports, as prose",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "constraints",
+      "from": "extract",
+      "to": "engine",
+      "label": "checkable codes",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "owned",
+      "from": "person",
+      "to": "engine",
+      "label": "read at intake",
+      "fromSide": "left",
+      "toSide": "right"
+    },
+    {
+      "id": "identity",
+      "from": "model",
+      "to": "engine",
+      "label": "product identity, nothing else",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "variant": "emphasis"
+    }
+  ]
+}
