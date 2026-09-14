@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCase } from "@/lib/cases";
+import { getCase, REGION, TABLE } from "@/lib/cases";
 import {
   Case,
   Check,
@@ -21,6 +21,7 @@ import {
   urgencyMark,
 } from "@/lib/present";
 import { Masthead } from "../../masthead";
+import { Provenance } from "../../provenance";
 
 export const dynamic = "force-dynamic";
 
@@ -228,6 +229,7 @@ function DeliveryBlock({
 
 export default async function CasePage({ params }: Params) {
   const { caseId } = await params;
+  const readAt = new Date().toISOString();
   const c = await getCase(caseId);
   if (!c) notFound();
 
@@ -412,12 +414,16 @@ export default async function CasePage({ params }: Params) {
         </dl>
       </section>
 
-      <footer className="foot">
-        <span className="micro">Source: openFDA food enforcement reports</span>
-        <span className="micro">
-          {c.pantry_name}, {c.pantry_location}
-        </span>
-      </footer>
+      <Provenance
+        read={{
+          table: TABLE,
+          region: REGION,
+          pantry: c.pantry_id,
+          at: readAt,
+        }}
+        rows={1}
+        noun="case"
+      />
     </main>
   );
 }
